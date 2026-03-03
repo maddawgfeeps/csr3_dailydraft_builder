@@ -153,7 +153,7 @@
       "bestIn": ["Track"]
     },
     {
-      "name": "Alfa Romeo Giukua GTAm",
+      "name": "Alfa Romeo Giulia GTAm",
       "rarity": "Uncommon",
       "stars": "1 Star",
       "country": "Italian",
@@ -194,7 +194,7 @@
     },
     {
       "name": "Dodge Challenger R/T Scat Pack Widebody",
-      "rarity": "Rare",
+      "rarity": "Uncommon",
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Dodge",
@@ -398,6 +398,14 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Nissan",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Audi R8 Coupe V10 Performance Quattro",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Audi",
       "bestIn": ["Sport"]
     },
     {
