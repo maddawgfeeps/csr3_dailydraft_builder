@@ -1,0 +1,7 @@
+{
+  "levels": {
+    "Level 1": { "win": 7, "loss": -6 },
+    "Level 2": { "win": 9, "loss": -5 },
+    "Level 3": { "win": 13, "loss": -4 }
+  }
+}
