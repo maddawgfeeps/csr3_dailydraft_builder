@@ -219,6 +219,26 @@
       localStorage.setItem('csr3IsCustomGarage', isCustomGarage);
     }
 
+	function updateGarageCounts() {
+	  const totalCars = allCars.length;
+
+	  const ownedCars = isCustomGarage
+		? Object.values(userGarageData).filter(c => c.owned).length
+		: totalCars;
+
+	  const assignedCars = new Set(
+		Object.values(team).map(c => c?.name).filter(Boolean)
+	  ).size;
+
+	  const unassignedCars = Math.max(ownedCars - assignedCars, 0);
+
+	  document.getElementById('garage-count').textContent =
+		`- ${ownedCars} Cars (${unassignedCars} unassigned cars)`;
+
+	  document.getElementById('modal-garage-count').textContent =
+		`- ${ownedCars}/${totalCars} Cars`;
+	}
+
     // ────────────────────────────────────────────────
     // RENDERING
     // ────────────────────────────────────────────────
@@ -314,6 +334,7 @@
       document.getElementById('country-bonus').textContent = `+${chem.breakdown.country || 0}`;
       document.getElementById('rarity-bonus').textContent  = `+${chem.breakdown.rarity || 0}`;
       document.getElementById('stars-bonus').textContent   = `+${chem.breakdown.stars || 0}`;
+	  updateGarageCounts();
     }
 
     // ────────────────────────────────────────────────
@@ -377,9 +398,11 @@
       });
       container.innerHTML += '</div>';
     }
+	updateGarageCounts();
 
     function openGarageEditor() {
       refreshModalList();
+	  updateGarageCounts();
       document.getElementById('garage-modal').classList.remove('hidden');
       document.getElementById('garage-modal').classList.add('flex');
     }
