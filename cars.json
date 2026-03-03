@@ -1,0 +1,268 @@
+{
+  "cars": [
+    {
+      "name": "Ferrari F8 Spider",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Ferrari",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Aston Martin DBS Coupe",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Aston Martin",
+      "bestIn": ["Street", "Tour"]
+    },
+    {
+      "name": "Porsche 911 Carrera 4S (992)",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Porsche",
+      "bestIn": ["Street", "Tour"]
+    },
+    {
+      "name": "Ford Mustang Dark Horse",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Ford",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Ferrari Roma",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Ferrari",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Chevrolet Stingray",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Chevrolet",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "BMW M4 Competition",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "BMW",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Ferrari SF90",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Ferrari",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Aston Martin DB12",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Aston Martin",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Nissan Z Nismo (RZ34)",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "Japanise",
+      "manufacturer": "Nissan",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Nissan GT-R (R35)",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "Japanise",
+      "manufacturer": "Nissan",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Lamborghini Huracan Evo",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Lamborghini",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Audi RS 5 Coupe",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Audi",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Acura NSX Type S",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Acura",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Porsche 911 GT3 RS (992)",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Porsche",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Porsche 718 Cayman GT4",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Porsche",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Jaguar XE SV Project 8",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Jaguar",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Aston Martin V12 Vantage",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Aston Martin",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Alpine A110 S",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "French",
+      "manufacturer": "Alpine",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Alfa Romeo Giukua GTAm",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Alfa Romeo",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Ferrari 812 Competizione",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Ferrari",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Mclaren 765LT",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Mclaren",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Toyota GR Supra",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "Japanise",
+      "manufacturer": "Toyota",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Ford Mustang Shelby GT500",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Ford",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Dodge Challenger R/T Scat Pack Widebody",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Dodge",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Chevrolet CT5-V Blackwing",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Chevrolet",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "BMW M2 Coupe",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "BMW",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "BMW M5 CS",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "BMW",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Lotus Emira First Edition",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Lotus",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Lexus LC500",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Lexus",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Jaguar F-Type R Coupe",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Jaguar",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Audi RS 6 Avant",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Audi",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Toyota GR Yaris",
+      "rarity": "Uncommon",
+      "stars": "1 Star",
+      "country": "Japanise",
+      "manufacturer": "Toyota",
+      "bestIn": ["Tour"]
+    }
+  ]
+}

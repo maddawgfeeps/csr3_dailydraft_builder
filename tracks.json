@@ -1,0 +1,34 @@
+{
+  "tracks": {
+    "America": {
+      "environments": {
+        "Dry": {
+          "types": ["Drag", "Street", "Sport"]
+        },
+        "Wet": {
+          "types": ["Drag", "Street", "Sport"]
+        }
+      }
+    },
+    "Amalfi Coast": {
+      "environments": {
+        "Dry": {
+          "types": ["Drag", "Tour", "Sport"]
+        },
+        "Wet": {
+          "types": ["Drag", "Tour", "Sport"]
+        }
+      }
+    },
+    "Tokyo": {
+      "environments": {
+        "Dry": {
+          "types": ["Drag", "Street", "Tour"]
+        },
+        "Wet": {
+          "types": ["Drag", "Street", "Tour"]
+        }
+      }
+    }
+  }
+}
