@@ -6,34 +6,13 @@
   <title>CSR 3 - Daily Draft Team Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .car-card {
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .car-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2);
-    }
-    .slot {
-      min-height: 180px;
-      transition: all 0.3s ease;
-    }
-    .slot.drag-over {
-      background-color: #27272a;
-      border-color: #eab308;
-    }
-    .badge {
-      font-size: 0.6875rem;
-      padding: 1px 6px;
-      border-radius: 9999px;
-    }
-    .star {
-      font-size: 1.35rem;
-      cursor: pointer;
-      transition: all 0.1s;
-    }
-    .star:hover {
-      transform: scale(1.3);
-    }
+    .car-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .car-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2); }
+    .slot { min-height: 180px; transition: all 0.3s ease; }
+    .slot.drag-over { background-color: #27272a; border-color: #eab308; }
+    .badge { font-size: 0.6875rem; padding: 1px 6px; border-radius: 9999px; }
+    .star { font-size: 1.35rem; cursor: pointer; transition: all 0.1s; }
+    .star:hover { transform: scale(1.3); }
     .win { color: #22c55e; font-weight: 600; }
     .loss { color: #ef4444; font-weight: 600; }
   </style>
@@ -42,9 +21,7 @@
   <!-- HEADER -->
   <div class="bg-zinc-900 border-b border-zinc-800">
     <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-      <div>
-        <h1 class="text-6xl font-black tracking-[-4px] text-white">CSR 3</h1>
-      </div>
+      <div><h1 class="text-6xl font-black tracking-[-4px] text-white">CSR 3</h1></div>
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
@@ -69,7 +46,7 @@
       </div>
       <div class="flex gap-3">
         <button onclick="toggleGarageMode()" id="garage-mode-btn" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium flex items-center gap-2">
-          <span id="garage-mode-text">My Garage</span>
+          <span id="garage-mode-text">Use My Garage</span>
         </button>
         <button onclick="useDefaultGarage()" id="default-btn" class="px-6 py-3 bg-zinc-700 text-zinc-400 rounded-2xl font-medium flex items-center gap-2 disabled:opacity-50" disabled>
           Use Default Garage
@@ -77,18 +54,21 @@
         <button onclick="openGarageEditor()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
           Manage My Garage
         </button>
+        <button onclick="showBestHandsModal()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
+          🔥 Best Combinations
+        </button>
       </div>
     </div>
 
     <div class="grid grid-cols-12 gap-8">
       <!-- Team Slots -->
       <div class="col-span-12 lg:col-span-7">
-        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-4">
           <span>Your Team</span>
-          <span id="chemistry-score" class="ml-auto text-3xl font-bold text-yellow-400">0</span>
+          <button onclick="resetTeam()" class="ml-auto px-5 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium">Reset Team</button>
+          <span id="chemistry-score" class="text-3xl font-bold text-yellow-400">0</span>
           <span class="text-sm text-zinc-500 font-normal">CHEMISTRY</span>
         </h2>
-
         <div id="slots-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
 
         <!-- Breakdown -->
@@ -109,10 +89,20 @@
 
       <!-- Garage -->
       <div class="col-span-12 lg:col-span-5">
-        <h2 class="text-xl font-semibold mb-4 flex items-center gap-3">
-          <span>Your Garage</span>
+        <div class="flex items-center justify-between mb-3">
+          <h2 id="garage-header" class="text-xl font-semibold">Default Garage</h2>
           <span id="garage-count" class="text-xs text-zinc-500 font-normal">- 0 Cars (unassigned cars)</span>
-        </h2>
+        </div>
+
+        <!-- Filter dropdowns -->
+        <div class="grid grid-cols-5 gap-2 mb-4 text-xs">
+          <select id="filter-rarity" onchange="applyFilters()" class="bg-zinc-800 text-white px-3 py-2 rounded-xl border border-zinc-700"></select>
+          <select id="filter-stars" onchange="applyFilters()" class="bg-zinc-800 text-white px-3 py-2 rounded-xl border border-zinc-700"></select>
+          <select id="filter-country" onchange="applyFilters()" class="bg-zinc-800 text-white px-3 py-2 rounded-xl border border-zinc-700"></select>
+          <select id="filter-manuf" onchange="applyFilters()" class="bg-zinc-800 text-white px-3 py-2 rounded-xl border border-zinc-700"></select>
+          <select id="filter-bestin" onchange="applyFilters()" class="bg-zinc-800 text-white px-3 py-2 rounded-xl border border-zinc-700"></select>
+        </div>
+
         <div id="garage" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
       </div>
     </div>
@@ -122,10 +112,7 @@
   <div id="garage-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
     <div class="bg-zinc-900 rounded-3xl w-full max-w-5xl max-h-[92vh] overflow-hidden flex flex-col">
       <div class="p-6 border-b border-zinc-700 flex items-center justify-between">
-        <h3 class="text-3xl font-bold flex items-center gap-3">
-          Manage My Garage
-          <span id="modal-garage-count" class="text-2xl text-zinc-400 font-normal">- 0/0 Cars</span>
-        </h3>
+        <h3 class="text-3xl font-bold flex items-center gap-3">Manage My Garage <span id="modal-garage-count" class="text-2xl text-zinc-400 font-normal">- 0/0 Cars</span></h3>
         <button onclick="closeGarageEditor()" class="text-4xl text-zinc-400 hover:text-white">×</button>
       </div>
       <div class="flex-1 overflow-auto p-6" id="modal-garage-list"></div>
@@ -149,7 +136,7 @@
     </div>
   </div>
 
-  <!-- Best Combinations Modal -->
+  <!-- BEST COMBINATIONS MODAL -->
   <div id="modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div class="bg-zinc-900 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
       <div class="p-6 border-b border-zinc-700 flex items-center justify-between">
@@ -176,6 +163,8 @@
 
     const slotColors = { "Drag":"#ef4444", "Street":"#3b82f6", "Tour":"#a855f7", "Sport":"#22c55e", "Grip":"#eab308" };
 
+    let filters = { rarity: 'All', stars: 'All', country: 'All', manufacturer: 'All', bestIn: 'All' };
+
     // ────────────────────────────────────────────────
     // CHEMISTRY + HELPERS
     // ────────────────────────────────────────────────
@@ -199,6 +188,7 @@
       let countryScore = 0; Object.values(country).forEach(n => { if (n===2) countryScore+=20; if (n===3) countryScore+=30; });
       total += countryScore; breakdown.country = countryScore;
       let rarityScore = 0;
+	  if (rarity.Legendary) { const n=rarity.Legendary; rarityScore += n===2?7:n===3?14:0; }
       if (rarity.Epic) { const n=rarity.Epic; rarityScore += n===2?6:n===3?12:0; }
       if (rarity.Rare) { const n=rarity.Rare; rarityScore += n===2?5:n===3?10:0; }
       if (rarity.Uncommon) { const n=rarity.Uncommon; rarityScore += n===2?4:n===3?8:0; }
@@ -219,25 +209,19 @@
       localStorage.setItem('csr3IsCustomGarage', isCustomGarage);
     }
 
-	function updateGarageCounts() {
-	  const totalCars = allCars.length;
+    function updateGarageCounts() {
+      const totalCars = allCars.length;
+      const ownedCars = isCustomGarage ? Object.values(userGarageData).filter(c => c.owned).length : totalCars;
+      const assignedCars = new Set(Object.values(team).map(c => c?.name).filter(Boolean)).size;
+      const unassignedCars = Math.max(ownedCars - assignedCars, 0);
+      document.getElementById('garage-count').textContent = `- ${ownedCars} Cars (${unassignedCars} unassigned cars)`;
+      document.getElementById('modal-garage-count').textContent = `- ${ownedCars}/${totalCars} Cars`;
+    }
 
-	  const ownedCars = isCustomGarage
-		? Object.values(userGarageData).filter(c => c.owned).length
-		: totalCars;
-
-	  const assignedCars = new Set(
-		Object.values(team).map(c => c?.name).filter(Boolean)
-	  ).size;
-
-	  const unassignedCars = Math.max(ownedCars - assignedCars, 0);
-
-	  document.getElementById('garage-count').textContent =
-		`- ${ownedCars} Cars (${unassignedCars} unassigned cars)`;
-
-	  document.getElementById('modal-garage-count').textContent =
-		`- ${ownedCars}/${totalCars} Cars`;
-	}
+    function updateGarageHeaderAndButton() {
+      document.getElementById('garage-header').textContent = isCustomGarage ? 'My Garage' : 'Default Garage';
+      document.getElementById('garage-mode-text').textContent = isCustomGarage ? 'Use Default Garage' : 'Use My Garage';
+    }
 
     // ────────────────────────────────────────────────
     // RENDERING
@@ -290,15 +274,11 @@
       const header = document.getElementById(`${slotId}-header`);
       const content = document.getElementById(`${slotId}-content`);
       const empty = document.getElementById(`${slotId}-empty`);
-
       content.innerHTML = '';
-
       if (carName) {
         const car = getEffectiveCar(carName);
         const isWin = car.bestIn && car.bestIn.includes(type);
-
         header.innerHTML = `${type.toUpperCase()} SLOT <span class="${isWin ? 'win' : 'loss'}"> - ${isWin ? 'Win' : 'Loss'}</span>`;
-
         const card = createCarCard(carName);
         card.classList.remove('cursor-grab');
         card.classList.add('cursor-pointer');
@@ -321,6 +301,12 @@
         const userData = userGarageData[baseCar.name] || {};
         const isOwned = isCustomGarage ? (userData.owned === true) : true;
         if (!isOwned || used.has(baseCar.name)) return;
+        const effective = getEffectiveCar(baseCar.name);
+        if (filters.rarity !== 'All' && effective.rarity !== filters.rarity) return;
+        if (filters.stars !== 'All' && effective.stars !== filters.stars) return;
+        if (filters.country !== 'All' && effective.country !== filters.country) return;
+        if (filters.manufacturer !== 'All' && effective.manufacturer !== filters.manufacturer) return;
+        if (filters.bestIn !== 'All' && (!effective.bestIn || !effective.bestIn.includes(filters.bestIn))) return;
         container.appendChild(createCarCard(baseCar.name));
       });
     }
@@ -328,17 +314,17 @@
     function updateAll() {
       renderAllSlots();
       renderGarage();
+      updateGarageCounts();
       const chem = getChemistry(team);
       document.getElementById('chemistry-score').textContent = chem.total;
       document.getElementById('manuf-bonus').textContent   = `+${chem.breakdown.manufacturer || 0}`;
       document.getElementById('country-bonus').textContent = `+${chem.breakdown.country || 0}`;
       document.getElementById('rarity-bonus').textContent  = `+${chem.breakdown.rarity || 0}`;
       document.getElementById('stars-bonus').textContent   = `+${chem.breakdown.stars || 0}`;
-	  updateGarageCounts();
     }
 
     // ────────────────────────────────────────────────
-    // DRAG & DROP
+    // DRAG & DROP + RESET
     // ────────────────────────────────────────────────
     function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
     function drag(ev) { ev.dataTransfer.setData("carName", ev.currentTarget.dataset.name); }
@@ -352,23 +338,57 @@
     function resetTeam() { team = {}; updateAll(); }
 
     // ────────────────────────────────────────────────
-    // GARAGE MODE & EDITOR (unchanged)
+    // GARAGE MODE
     // ────────────────────────────────────────────────
     function toggleGarageMode() {
       isCustomGarage = !isCustomGarage;
       document.getElementById('default-btn').disabled = !isCustomGarage;
-      document.getElementById('garage-mode-text').textContent = isCustomGarage ? "Default Garage" : "My Garage";
+      updateGarageHeaderAndButton();
       saveGarageState();
       updateAll();
     }
     function useDefaultGarage() {
       isCustomGarage = false;
       document.getElementById('default-btn').disabled = true;
-      document.getElementById('garage-mode-text').textContent = "My Garage";
+      updateGarageHeaderAndButton();
       saveGarageState();
       updateAll();
     }
 
+    // ────────────────────────────────────────────────
+    // FILTERS
+    // ────────────────────────────────────────────────
+    function populateFilters() {
+      const rarities = [...new Set(allCars.map(c => c.rarity))].sort();
+      const starsList = ["1 Star","2 Star","3 Star","4 Star","5 Star"];
+      const countries = [...new Set(allCars.map(c => c.country))].sort();
+      const manufs = [...new Set(allCars.map(c => c.manufacturer))].sort();
+      const bestIns = [...new Set(allCars.flatMap(c => c.bestIn || []))].sort();
+      const addOptions = (id, list) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="All">All</option>';
+        list.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
+      };
+      addOptions('filter-rarity', rarities);
+      addOptions('filter-stars', starsList);
+      addOptions('filter-country', countries);
+      addOptions('filter-manuf', manufs);
+      addOptions('filter-bestin', bestIns);
+    }
+
+    function applyFilters() {
+      filters.rarity = document.getElementById('filter-rarity').value;
+      filters.stars = document.getElementById('filter-stars').value;
+      filters.country = document.getElementById('filter-country').value;
+      filters.manufacturer = document.getElementById('filter-manuf').value;
+      filters.bestIn = document.getElementById('filter-bestin').value;
+      renderGarage();
+      updateGarageCounts();
+    }
+
+    // ────────────────────────────────────────────────
+    // GARAGE EDITOR
+    // ────────────────────────────────────────────────
     function refreshModalList() {
       const container = document.getElementById('modal-garage-list');
       container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
@@ -397,12 +417,11 @@
         container.appendChild(div);
       });
       container.innerHTML += '</div>';
+      updateGarageCounts();
     }
-	updateGarageCounts();
 
     function openGarageEditor() {
       refreshModalList();
-	  updateGarageCounts();
       document.getElementById('garage-modal').classList.remove('hidden');
       document.getElementById('garage-modal').classList.add('flex');
     }
@@ -427,7 +446,7 @@
     function saveUserGarage() {
       isCustomGarage = true;
       document.getElementById('default-btn').disabled = false;
-      document.getElementById('garage-mode-text').textContent = "Default Garage";
+      updateGarageHeaderAndButton();
       saveGarageState();
       closeGarageEditor();
       updateAll();
@@ -448,13 +467,19 @@
       hideClearConfirmation();
     }
 
-    // Best Combinations modal (unchanged)
+    // ────────────────────────────────────────────────
+    // BEST COMBINATIONS (restored + respects garage mode)
+    // ────────────────────────────────────────────────
     function showBestHandsModal() {
+      const availableCars = isCustomGarage 
+        ? sortedCars(allCars).filter(c => userGarageData[c.name] && userGarageData[c.name].owned)
+        : sortedCars(allCars);
+
       const combos = [];
-      for (let i = 0; i < allCars.length; i++) {
-        for (let j = i+1; j < allCars.length; j++) {
-          for (let k = j+1; k < allCars.length; k++) {
-            const sel = [allCars[i], allCars[j], allCars[k]];
+      for (let i = 0; i < availableCars.length; i++) {
+        for (let j = i+1; j < availableCars.length; j++) {
+          for (let k = j+1; k < availableCars.length; k++) {
+            const sel = [availableCars[i], availableCars[j], availableCars[k]];
             const fakeTeam = {t1:sel[0],t2:sel[1],t3:sel[2]};
             const chem = getChemistry(fakeTeam);
             combos.push({cars:sel, chemistry:chem.total, breakdown:chem.breakdown});
@@ -462,6 +487,7 @@
         }
       }
       combos.sort((a,b)=>b.chemistry-a.chemistry);
+
       const content = document.getElementById('modal-content');
       content.innerHTML = combos.slice(0,12).map((c,idx)=>`
         <div class="bg-zinc-800 rounded-3xl p-5 ${idx===0?'ring-2 ring-yellow-400/50':''}">
@@ -485,14 +511,24 @@
       document.getElementById('modal').classList.remove('hidden');
     }
 
-    // Data loading (unchanged)
+    // ────────────────────────────────────────────────
+    // DATA LOADING
+    // ────────────────────────────────────────────────
     async function loadData() {
       try {
         const t = await fetch('./tracks.json'); tracksData = await t.json();
         const c = await fetch('./cars.json'); const d = await c.json(); allCars = d.cars;
+
         populateSelectors();
         currentTrack = Object.keys(tracksData.tracks)[0];
         currentEnv = Object.keys(tracksData.tracks[currentTrack].environments)[0];
+
+        document.getElementById('track-select').value = currentTrack;
+        populateEnvSelect();
+        document.getElementById('env-select').value = currentEnv;
+
+        populateFilters();
+        updateGarageHeaderAndButton();
         loadTrackAndEnv();
       } catch(e) { console.error(e); }
     }
@@ -504,7 +540,6 @@
         ts.appendChild(o);
       });
       ts.onchange = e => { currentTrack = e.target.value; populateEnvSelect(); loadTrackAndEnv(); };
-      populateEnvSelect();
     }
 
     function populateEnvSelect() {
@@ -516,6 +551,24 @@
         es.appendChild(o);
       });
       es.onchange = e => { currentEnv = e.target.value; loadTrackAndEnv(); };
+    }
+
+    function populateFilters() {
+      const rarities = [...new Set(allCars.map(c => c.rarity))].sort();
+      const starsList = ["1 Star","2 Star","3 Star","4 Star","5 Star"];
+      const countries = [...new Set(allCars.map(c => c.country))].sort();
+      const manufs = [...new Set(allCars.map(c => c.manufacturer))].sort();
+      const bestIns = [...new Set(allCars.flatMap(c => c.bestIn || []))].sort();
+      const addOptions = (id, list) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="All">All</option>';
+        list.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
+      };
+      addOptions('filter-rarity', rarities);
+      addOptions('filter-stars', starsList);
+      addOptions('filter-country', countries);
+      addOptions('filter-manuf', manufs);
+      addOptions('filter-bestin', bestIns);
     }
 
     function loadTrackAndEnv() {

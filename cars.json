@@ -57,7 +57,7 @@
       "bestIn": ["Street"]
     },
     {
-      "name": "Ferrari SF90",
+      "name": "Ferrari SF90 Stradale",
       "rarity": "Epic",
       "stars": "1 Star",
       "country": "Italian",
@@ -217,6 +217,54 @@
       "bestIn": ["Drag"]
     },
     {
+      "name": "Ford Ruffian Mustang 70",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Ford",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Dodge Charger SRT Hellcat Redeye",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Dodge",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Hennessey Venom F5",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Hennessey",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Koenigsegg Jesko Absolut",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "Swedish",
+      "manufacturer": "Koenigsegg",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Mclaren Speedtail",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Mclaren",
+      "bestIn": ["Drag"]
+    },
+    {
+      "name": "Dodge Challenger SRT Demon",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Dodge",
+      "bestIn": ["Drag"]
+    },
+    {
       "name": "BMW M5 CS",
       "rarity": "Rare",
       "stars": "1 Star",
@@ -263,6 +311,142 @@
       "country": "Japanise",
       "manufacturer": "Toyota",
       "bestIn": ["Tour"]
+    },
+    {
+      "name": "Pagani Utopia",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Pagani",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Maserati MC20",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Maserati",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Porsche 911 Turbo S (992)",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Porsche",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Bentley Continental GT Speed",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Bentley",
+      "bestIn": ["Tour"]
+    },
+    {
+      "name": "Bugatti Chiron Sport",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "French",
+      "manufacturer": "Bugatti",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Lamborghini Revuelto",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Lamborghini",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Lexus LFA",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Japanise",
+      "manufacturer": "Lexus",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Mclaren Artura",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Mclaren",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Apollo Intensa Emozione",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "German",
+      "manufacturer": "Apollo",
+      "bestIn": ["Street"]
+    },
+    {
+      "name": "Lamborghini Aventador SVJ",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Italian",
+      "manufacturer": "Lamborghini",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Nissan GT-R Nismo (R35)",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "Japanise",
+      "manufacturer": "Nissan",
+      "bestIn": ["Sport"]
+    },
+    {
+      "name": "Aston Martin Valkyrie",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Aston Martin",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Mclaren Senna",
+      "rarity": "Legendary",
+      "stars": "1 Star",
+      "country": "British",
+      "manufacturer": "Mclaren",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Dodge Viper ACR Extreme Aero",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Dodge",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Ford GT",
+      "rarity": "Epic",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Ford",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Chevrolet Camaro ZL1 1LE",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Chevrolet",
+      "bestIn": ["Track"]
+    },
+    {
+      "name": "Chevrolet Corvette Z06",
+      "rarity": "Rare",
+      "stars": "1 Star",
+      "country": "American",
+      "manufacturer": "Chevrolet",
+      "bestIn": ["Track"]
     }
   ]
 }
