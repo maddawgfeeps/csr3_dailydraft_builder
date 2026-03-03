@@ -56,9 +56,6 @@
         <button onclick="openGarageEditor()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
           Manage My Garage
         </button>
-        <button onclick="showBestHandsModal()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
-          🔥 Best Combinations
-        </button>
       </div>
     </div>
 
@@ -121,8 +118,35 @@
     </div>
   </div>
 
-  <!-- GARAGE EDITOR, CLEAR, BEST COMBOS modals unchanged (same as last version) -->
-  <!-- [Omitted for space – copy them from your previous file if needed; they are identical] -->
+  <!-- Garage editor modal -->
+  <div id="garage-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-zinc-700">
+      <div class="p-6 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h3 class="text-xl font-semibold">Manage My Garage</h3>
+          <span id="modal-garage-count" class="text-xs text-zinc-500 font-normal">- 0/0 Cars</span>
+        </div>
+        <button onclick="closeGarageEditor()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div id="modal-garage-list" class="p-6 overflow-y-auto max-h-[65vh]"></div>
+      <div class="p-6 border-t border-zinc-800 flex justify-between">
+        <button onclick="showClearConfirmation()" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium">Clear Garage</button>
+        <button onclick="saveUserGarage()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear garage confirmation -->
+  <div id="clear-modal" class="fixed inset-0 bg-black/70 z-[60] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-md">
+      <h4 class="text-lg font-semibold mb-2">Clear My Garage?</h4>
+      <p class="text-zinc-400 text-sm mb-5">This will remove all ownership/star selections from your custom garage.</p>
+      <div class="flex justify-end gap-3">
+        <button onclick="hideClearConfirmation()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Cancel</button>
+        <button onclick="confirmClearGarage()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl font-medium">Clear</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ────────────────────────────────────────────────
@@ -299,7 +323,10 @@
     function renderGarage() {
       const container = document.getElementById('garage');
       container.innerHTML = '';
-      const used = new Set(Object.values(team).map(c => c?.name).filter(Boolean));
+      const used = new Set([
+        ...Object.values(team).map(c => c?.name).filter(Boolean),
+        ...autoHands.flatMap(hand => hand.assignment.map(car => car?.name)).filter(Boolean)
+      ]);
       sortedCars(allCars).forEach(baseCar => {
         const userData = userGarageData[baseCar.name] || {};
         const isOwned = isCustomGarage ? (userData.owned === true) : true;
@@ -472,49 +499,6 @@
     }
 
     // ────────────────────────────────────────────────
-    // BEST COMBINATIONS (with type)
-    // ────────────────────────────────────────────────
-    function showBestHandsModal() {
-      const availableCars = isCustomGarage 
-        ? sortedCars(allCars).filter(c => userGarageData[c.name] && userGarageData[c.name].owned)
-        : sortedCars(allCars);
-      const combos = [];
-      for (let i = 0; i < availableCars.length; i++) {
-        for (let j = i+1; j < availableCars.length; j++) {
-          for (let k = j+1; k < availableCars.length; k++) {
-            const sel = [availableCars[i], availableCars[j], availableCars[k]];
-            const fakeTeam = {t1:sel[0],t2:sel[1],t3:sel[2]};
-            const chem = getChemistry(fakeTeam);
-            combos.push({cars:sel, chemistry:chem.total, breakdown:chem.breakdown});
-          }
-        }
-      }
-      combos.sort((a,b)=>b.chemistry-a.chemistry);
-      const content = document.getElementById('modal-content');
-      content.innerHTML = combos.slice(0,12).map((c,idx)=>`
-        <div class="bg-zinc-800 rounded-3xl p-5 ${idx===0?'ring-2 ring-yellow-400/50':''}">
-          <div class="flex justify-between mb-4">
-            <div class="text-2xl font-bold text-yellow-400">#${idx+1}</div>
-            <div class="text-3xl font-bold">${c.chemistry}</div>
-          </div>
-          <div class="grid grid-cols-3 gap-4 text-sm">
-            ${c.cars.map(car=>`
-              <div class="bg-zinc-900 rounded-2xl p-4 text-center">
-                <div class="font-medium">${car.name}</div>
-                <div class="flex justify-center gap-1 mt-2 text-xs">
-                  <span class="badge bg-purple-900/60 text-purple-200">${car.rarity}</span>
-                  <span class="badge bg-yellow-900/60 text-yellow-200">${car.stars}</span>
-                  ${car.bestIn && car.bestIn.length ? `<span class="badge bg-gray-700/80 text-gray-200">${car.bestIn.join(' • ')}</span>` : ''}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('');
-      document.getElementById('modal').classList.remove('hidden');
-    }
-
-    // ────────────────────────────────────────────────
     // AUTO POPULATE HANDS (sorted + difficulty)
     // ────────────────────────────────────────────────
     function autoPopulateHands() {
@@ -546,7 +530,7 @@
                 const chem = getChemistry({t1:{name:assignment[0].name},t2:{name:assignment[1].name},t3:{name:assignment[2].name}});
                 const score = chem.total;
 
-                if (score > bestScore) {
+                if (wins >= 2 && score > bestScore) {
                   bestScore = score;
                   bestHand = trio;
                   bestAssignment = assignment;
@@ -561,6 +545,7 @@
         autoHands.push({
           cars: bestHand,
           assignment: bestAssignment,
+          wins: bestAssignment.filter((car, idx) => car.bestIn && car.bestIn.includes(currentTypes[idx])).length,
           chemistry: getChemistry({t1:{name:bestAssignment[0].name},t2:{name:bestAssignment[1].name},t3:{name:bestAssignment[2].name}}).total,
           breakdown: getChemistry({t1:{name:bestAssignment[0].name},t2:{name:bestAssignment[1].name},t3:{name:bestAssignment[2].name}}).breakdown
         });
@@ -573,8 +558,10 @@
       autoHands.sort((a,b) => b.chemistry - a.chemistry);
 
       renderAutoHands();
-      document.getElementById('auto-hands-section').classList.remove('hidden');
-      renderGarage(); // remove used cars
+      const section = document.getElementById('auto-hands-section');
+      if (autoHands.length > 0) section.classList.remove('hidden');
+      else section.classList.add('hidden');
+      renderGarage();
     }
 
     function renderAutoHands() {
@@ -586,6 +573,7 @@
         handDiv.innerHTML = `
           <div class="flex justify-between items-center mb-6">
             <div class="text-emerald-400 font-medium">Hand ${idx+1} — Chemistry ${hand.chemistry}</div>
+            <div class="text-sm font-medium text-zinc-300">${hand.wins} of 3 wins</div>
           </div>
           <div class="grid grid-cols-3 gap-6">
             ${currentTypes.map((type, i) => {
