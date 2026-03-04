@@ -16,6 +16,19 @@
     .win { color: #22c55e; font-weight: 600; }
     .loss { color: #ef4444; font-weight: 600; }
     .hand-container { background: #18181b; border: 2px solid #3b82f6; border-radius: 24px; padding: 20px; }
+    .collapsible-panel {
+      overflow: hidden;
+      max-height: 1000px;
+      opacity: 1;
+      transform: translateY(0);
+      transition: max-height 0.45s ease, opacity 0.35s ease, transform 0.35s ease, margin 0.35s ease;
+    }
+    .collapsible-panel.collapsed {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-14px);
+      margin-top: 0 !important;
+    }
   </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -69,7 +82,25 @@
           <span id="chemistry-score" class="text-3xl font-bold text-yellow-400">0</span>
           <span class="text-sm text-zinc-500 font-normal">CHEMISTRY</span>
         </h2>
-        <div id="slots-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        <div id="team-selection-panel" class="collapsible-panel mt-0">
+          <div id="slots-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+
+          <!-- Breakdown -->
+          <div class="mt-8 bg-zinc-900 rounded-3xl p-6">
+            <h3 class="text-sm uppercase text-zinc-400 mb-4">Chemistry Breakdown</h3>
+            <div class="grid grid-cols-2 gap-6 text-sm">
+              <div class="space-y-2">
+                <div class="flex justify-between"><span class="text-zinc-400">Manufacturer</span><span id="manuf-bonus" class="font-mono font-bold text-emerald-400">+0</span></div>
+                <div class="flex justify-between"><span class="text-zinc-400">Country</span><span id="country-bonus" class="font-mono font-bold text-sky-400">+0</span></div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between"><span class="text-zinc-400">Rarity</span><span id="rarity-bonus" class="font-mono font-bold text-purple-400">+0</span></div>
+                <div class="flex justify-between"><span class="text-zinc-400">Stars</span><span id="stars-bonus" class="font-mono font-bold text-amber-400">+0</span></div>
+                <div class="flex justify-between"><span class="text-zinc-400">Difficulty</span><span id="difficulty-bonus" class="font-mono font-bold text-rose-400">+0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Auto-Populated Hands -->
         <div id="auto-hands-section" class="mt-12 hidden">
@@ -80,21 +111,6 @@
           <div id="auto-hands" class="space-y-10"></div>
         </div>
 
-        <!-- Breakdown -->
-        <div class="mt-8 bg-zinc-900 rounded-3xl p-6">
-          <h3 class="text-sm uppercase text-zinc-400 mb-4">Chemistry Breakdown</h3>
-          <div class="grid grid-cols-2 gap-6 text-sm">
-            <div class="space-y-2">
-              <div class="flex justify-between"><span class="text-zinc-400">Manufacturer</span><span id="manuf-bonus" class="font-mono font-bold text-emerald-400">+0</span></div>
-              <div class="flex justify-between"><span class="text-zinc-400">Country</span><span id="country-bonus" class="font-mono font-bold text-sky-400">+0</span></div>
-            </div>
-            <div class="space-y-2">
-              <div class="flex justify-between"><span class="text-zinc-400">Rarity</span><span id="rarity-bonus" class="font-mono font-bold text-purple-400">+0</span></div>
-              <div class="flex justify-between"><span class="text-zinc-400">Stars</span><span id="stars-bonus" class="font-mono font-bold text-amber-400">+0</span></div>
-              <div class="flex justify-between"><span class="text-zinc-400">Difficulty</span><span id="difficulty-bonus" class="font-mono font-bold text-rose-400">+0</span></div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Garage -->
@@ -181,8 +197,11 @@
     }
 
     function getChemistry(teamObj) {
-      const cars = Object.values(teamObj).filter(Boolean).map(c => getEffectiveCar(c.name)).filter(Boolean);
-      if (cars.length !== 3) return { total: 0, breakdown: {} };
+      const cars = currentTypes.map(type => {
+        const assigned = teamObj[type];
+        return assigned ? getEffectiveCar(assigned.name) : null;
+      });
+      if (cars.some(car => !car)) return { total: 0, breakdown: {} };
 
       const count = (arr, key) => arr.reduce((acc, c) => { acc[c[key]] = (acc[c[key]] || 0) + 1; return acc; }, {});
       const manuf = count(cars, 'manufacturer'), country = count(cars, 'country'),
@@ -341,17 +360,27 @@
       });
     }
 
+    function formatScore(value) {
+      return `${value >= 0 ? '+' : ''}${value}`;
+    }
+
+    function setTeamSelectionVisibility(show) {
+      const panel = document.getElementById('team-selection-panel');
+      if (!panel) return;
+      panel.classList.toggle('collapsed', !show);
+    }
+
     function updateAll() {
       renderAllSlots();
       renderGarage();
       updateGarageCounts();
       const chem = getChemistry(team);
       document.getElementById('chemistry-score').textContent = chem.total;
-      document.getElementById('manuf-bonus').textContent   = `+${chem.breakdown.manufacturer || 0}`;
-      document.getElementById('country-bonus').textContent = `+${chem.breakdown.country || 0}`;
-      document.getElementById('rarity-bonus').textContent  = `+${chem.breakdown.rarity || 0}`;
-      document.getElementById('stars-bonus').textContent   = `+${chem.breakdown.stars || 0}`;
-      document.getElementById('difficulty-bonus').textContent = `+${chem.breakdown.difficulty || 0}`;
+      document.getElementById('manuf-bonus').textContent   = formatScore(chem.breakdown.manufacturer || 0);
+      document.getElementById('country-bonus').textContent = formatScore(chem.breakdown.country || 0);
+      document.getElementById('rarity-bonus').textContent  = formatScore(chem.breakdown.rarity || 0);
+      document.getElementById('stars-bonus').textContent   = formatScore(chem.breakdown.stars || 0);
+      document.getElementById('difficulty-bonus').textContent = formatScore(chem.breakdown.difficulty || 0);
     }
 
     // ────────────────────────────────────────────────
@@ -366,7 +395,7 @@
       team[slotType] = { name };
       updateAll();
     }
-    function resetTeam() { team = {}; updateAll(); }
+    function resetTeam() { team = {}; setTeamSelectionVisibility(true); updateAll(); }
 
     // ────────────────────────────────────────────────
     // GARAGE MODE
@@ -527,7 +556,12 @@
                   if (car.bestIn && car.bestIn.includes(type)) wins++;
                 });
 
-                const chem = getChemistry({t1:{name:assignment[0].name},t2:{name:assignment[1].name},t3:{name:assignment[2].name}});
+                const assignedTeam = {
+                  [currentTypes[0]]: { name: assignment[0].name },
+                  [currentTypes[1]]: { name: assignment[1].name },
+                  [currentTypes[2]]: { name: assignment[2].name }
+                };
+                const chem = getChemistry(assignedTeam);
                 const score = chem.total;
 
                 if (wins >= 2 && score > bestScore) {
@@ -546,8 +580,16 @@
           cars: bestHand,
           assignment: bestAssignment,
           wins: bestAssignment.filter((car, idx) => car.bestIn && car.bestIn.includes(currentTypes[idx])).length,
-          chemistry: getChemistry({t1:{name:bestAssignment[0].name},t2:{name:bestAssignment[1].name},t3:{name:bestAssignment[2].name}}).total,
-          breakdown: getChemistry({t1:{name:bestAssignment[0].name},t2:{name:bestAssignment[1].name},t3:{name:bestAssignment[2].name}}).breakdown
+          chemistry: getChemistry({
+            [currentTypes[0]]: { name: bestAssignment[0].name },
+            [currentTypes[1]]: { name: bestAssignment[1].name },
+            [currentTypes[2]]: { name: bestAssignment[2].name }
+          }).total,
+          breakdown: getChemistry({
+            [currentTypes[0]]: { name: bestAssignment[0].name },
+            [currentTypes[1]]: { name: bestAssignment[1].name },
+            [currentTypes[2]]: { name: bestAssignment[2].name }
+          }).breakdown
         });
 
         const usedNames = new Set(bestHand.map(c => c.name));
@@ -559,8 +601,13 @@
 
       renderAutoHands();
       const section = document.getElementById('auto-hands-section');
-      if (autoHands.length > 0) section.classList.remove('hidden');
-      else section.classList.add('hidden');
+      if (autoHands.length > 0) {
+        section.classList.remove('hidden');
+        setTeamSelectionVisibility(false);
+      } else {
+        section.classList.add('hidden');
+        setTeamSelectionVisibility(true);
+      }
       renderGarage();
     }
 
@@ -615,6 +662,7 @@
     function clearAutoHands() {
       autoHands = [];
       document.getElementById('auto-hands-section').classList.add('hidden');
+      setTeamSelectionVisibility(true);
       renderGarage();
     }
 
