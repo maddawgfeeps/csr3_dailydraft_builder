@@ -6,14 +6,14 @@
           "types": ["Drag", "Street", "Sport"]
         },
         "Wet": {
-          "types": ["Drag", "Street", "Sport"]
+          "types": ["Drag", "Drag", "Track"]
         }
       }
     },
     "Amalfi Coast": {
       "environments": {
         "Dry": {
-          "types": ["Drag", "Tour", "Sport"]
+          "types": ["Street", "Tour", "Sport"]
         },
         "Wet": {
           "types": ["Sport", "Street", "Street"]
@@ -23,10 +23,10 @@
     "Tokyo": {
       "environments": {
         "Dry": {
-          "types": ["Drag", "Street", "Tour"]
+          "types": ["Sport", "Street", "Tour"]
         },
         "Wet": {
-          "types": ["Drag", "Street", "Tour"]
+          "types": ["Sport", "Street", "Tour"]
         }
       }
     }

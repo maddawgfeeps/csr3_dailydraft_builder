@@ -39,6 +39,7 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.1 © MaddawgFeeps</button>
       </div>
     </div>
   </div>
@@ -63,9 +64,6 @@
         <button onclick="toggleGarageMode()" id="garage-mode-btn" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium flex items-center gap-2">
           <span id="garage-mode-text">Use My Garage</span>
         </button>
-        <button onclick="useDefaultGarage()" id="default-btn" class="px-6 py-3 bg-zinc-700 text-zinc-400 rounded-2xl font-medium flex items-center gap-2 disabled:opacity-50" disabled>
-          Use Default Garage
-        </button>
         <button onclick="openGarageEditor()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
           Manage My Garage
         </button>
@@ -79,8 +77,8 @@
           <span>Your Team</span>
           <button onclick="resetTeam()" class="ml-auto px-5 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium">Reset Team</button>
           <button onclick="autoPopulateHands()" class="px-5 py-1.5 text-sm bg-emerald-600 hover:bg-emerald-500 rounded-xl font-medium">Auto Populate</button>
-          <span id="chemistry-score" class="text-3xl font-bold text-yellow-400">0</span>
-          <span class="text-sm text-zinc-500 font-normal">CHEMISTRY</span>
+          <span id="chemistry-score" class="text-3xl font-bold text-yellow-400">0 - 0</span>
+          <span id="chemistry-label" class="text-sm text-zinc-500 font-normal">CHEMISTRY (Range)</span>
         </h2>
         <div id="team-selection-panel" class="collapsible-panel mt-0">
           <div id="slots-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
@@ -96,7 +94,10 @@
               <div class="space-y-2">
                 <div class="flex justify-between"><span class="text-zinc-400">Rarity</span><span id="rarity-bonus" class="font-mono font-bold text-purple-400">+0</span></div>
                 <div class="flex justify-between"><span class="text-zinc-400">Stars</span><span id="stars-bonus" class="font-mono font-bold text-amber-400">+0</span></div>
-                <div class="flex justify-between"><span class="text-zinc-400">Difficulty</span><span id="difficulty-bonus" class="font-mono font-bold text-rose-400">+0</span></div>
+                <div>
+                  <div class="text-zinc-400 mb-1">Difficulty</div>
+                  <div id="difficulty-bonus" class="font-mono font-bold text-rose-400 space-y-1">+0</div>
+                </div>
               </div>
             </div>
           </div>
@@ -164,6 +165,18 @@
     </div>
   </div>
 
+
+  <!-- Changelog modal -->
+  <div id="changelog-modal" class="fixed inset-0 bg-black/70 z-[70] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-semibold">Changelog</h4>
+        <button onclick="closeChangelog()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div id="changelog-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div>
+    </div>
+  </div>
+
   <script>
     // ────────────────────────────────────────────────
     // DATA & STATE
@@ -185,6 +198,16 @@
     let filters = { rarity: 'All', stars: 'All', country: 'All', manufacturer: 'All', bestIn: 'All' };
     let autoHands = [];
 
+    const changelogEntries = [
+      { version: 'v0.0.1', date: 'Current', changes: [
+        'Added clickable build version under TEAM BUILDER with in-app changelog modal.',
+        'Difficulty now supports Low / Med / High PWR profiles for each level.',
+        'Chemistry now displays a range and detailed difficulty outcomes per selected level.',
+        'Auto-populated hands now refresh chemistry/range when difficulty level changes.',
+        'Removed duplicate Use Default Garage button; single toggle remains.'
+      ]}
+    ];
+
     // ────────────────────────────────────────────────
     // CHEMISTRY (now includes Difficulty)
     // ────────────────────────────────────────────────
@@ -196,54 +219,60 @@
       return { ...base, stars: "1 Star" };
     }
 
+    function getDifficultyVariantsForCurrentLevel() {
+      const selected = difficultyData.levels[currentDifficulty] || {};
+      return Object.entries(selected).map(([label, values]) => ({ label, ...values }));
+    }
+
     function getChemistry(teamObj) {
       const cars = currentTypes.map((type, index) => {
         const assigned = teamObj[getSlotKey(index)];
         return assigned ? getEffectiveCar(assigned.name) : null;
       });
-      if (cars.some(car => !car)) return { total: 0, breakdown: {} };
+      if (cars.some(car => !car)) return { total: 0, minTotal: 0, maxTotal: 0, breakdown: {}, difficultyLines: [] };
 
       const count = (arr, key) => arr.reduce((acc, c) => { acc[c[key]] = (acc[c[key]] || 0) + 1; return acc; }, {});
       const manuf = count(cars, 'manufacturer'), country = count(cars, 'country'),
             rarity = count(cars, 'rarity'), stars = count(cars, 'stars');
 
-      let total = 0, breakdown = {};
+      let baseTotal = 0, breakdown = {};
 
-      // Manufacturer
       let manufScore = 0; Object.values(manuf).forEach(n => { if (n >= 2) manufScore += 10 * n; });
-      total += manufScore; breakdown.manufacturer = manufScore;
+      baseTotal += manufScore; breakdown.manufacturer = manufScore;
 
-      // Country
       let countryScore = 0; Object.values(country).forEach(n => { if (n===2) countryScore+=20; if (n===3) countryScore+=30; });
-      total += countryScore; breakdown.country = countryScore;
+      baseTotal += countryScore; breakdown.country = countryScore;
 
-      // Rarity
       let rarityScore = 0;
       if (rarity.Legendary) { const n=rarity.Legendary; rarityScore += n===2?7:n===3?14:0; }
       if (rarity.Epic) { const n=rarity.Epic; rarityScore += n===2?6:n===3?12:0; }
       if (rarity.Rare) { const n=rarity.Rare; rarityScore += n===2?5:n===3?10:0; }
       if (rarity.Uncommon) { const n=rarity.Uncommon; rarityScore += n===2?4:n===3?8:0; }
-      total += rarityScore; breakdown.rarity = rarityScore;
+      baseTotal += rarityScore; breakdown.rarity = rarityScore;
 
-      // Stars
       let starsScore = 0;
       const starBonuses = {"1 Star":{2:2,3:4},"2 Star":{2:3,3:6},"3 Star":{2:4,3:8},"4 Star":{2:5,3:10},"5 Star":{2:6,3:12}};
       Object.entries(stars).forEach(([level,n]) => { if (n>=2 && starBonuses[level]) starsScore += starBonuses[level][n]||0; });
-      total += starsScore; breakdown.stars = starsScore;
+      baseTotal += starsScore; breakdown.stars = starsScore;
 
-      // NEW: Difficulty win/loss per slot
-      let difficultyScore = 0;
-      const diff = difficultyData.levels[currentDifficulty];
-      currentTypes.forEach((type, i) => {
+      const wins = currentTypes.reduce((acc, type, i) => {
         const car = cars[i];
-        if (!car) return;
-        const isWin = car.bestIn && car.bestIn.includes(type);
-        difficultyScore += isWin ? diff.win : diff.loss;
-      });
-      total += difficultyScore;
-      breakdown.difficulty = difficultyScore;
+        return acc + ((car.bestIn && car.bestIn.includes(type)) ? 1 : 0);
+      }, 0);
+      const losses = currentTypes.length - wins;
 
-      return { total, breakdown };
+      const difficultyLines = getDifficultyVariantsForCurrentLevel().map(variant => {
+        const score = wins * variant.win + losses * variant.loss;
+        return { label: variant.label, wins, score };
+      });
+
+      const totals = difficultyLines.map(line => baseTotal + line.score);
+      const minTotal = Math.min(...totals);
+      const maxTotal = Math.max(...totals);
+      const medLine = difficultyLines.find(line => line.label.includes('Med PWR')) || difficultyLines[0] || { score: 0 };
+      breakdown.difficulty = medLine.score;
+
+      return { total: baseTotal + medLine.score, minTotal, maxTotal, breakdown, difficultyLines };
     }
 
     function sortedCars(carsArray) {
@@ -381,12 +410,13 @@
       renderGarage();
       updateGarageCounts();
       const chem = getChemistry(team);
-      document.getElementById('chemistry-score').textContent = chem.total;
+      document.getElementById('chemistry-score').textContent = `${chem.minTotal} - ${chem.maxTotal}`;
       document.getElementById('manuf-bonus').textContent   = formatScore(chem.breakdown.manufacturer || 0);
       document.getElementById('country-bonus').textContent = formatScore(chem.breakdown.country || 0);
       document.getElementById('rarity-bonus').textContent  = formatScore(chem.breakdown.rarity || 0);
       document.getElementById('stars-bonus').textContent   = formatScore(chem.breakdown.stars || 0);
-      document.getElementById('difficulty-bonus').textContent = formatScore(chem.breakdown.difficulty || 0);
+      const difficultyEl = document.getElementById('difficulty-bonus');
+      difficultyEl.innerHTML = (chem.difficultyLines || []).map(line => `<div>${formatScore(line.score)} (${line.wins}x ${line.label} Wins)</div>`).join('') || '+0';
     }
 
     // ────────────────────────────────────────────────
@@ -409,14 +439,6 @@
     // ────────────────────────────────────────────────
     function toggleGarageMode() {
       isCustomGarage = !isCustomGarage;
-      document.getElementById('default-btn').disabled = !isCustomGarage;
-      updateGarageHeaderAndButton();
-      saveGarageState();
-      updateAll();
-    }
-    function useDefaultGarage() {
-      isCustomGarage = false;
-      document.getElementById('default-btn').disabled = true;
       updateGarageHeaderAndButton();
       saveGarageState();
       updateAll();
@@ -512,7 +534,6 @@
 
     function saveUserGarage() {
       isCustomGarage = true;
-      document.getElementById('default-btn').disabled = false;
       updateGarageHeaderAndButton();
       saveGarageState();
       closeGarageEditor();
@@ -594,7 +615,10 @@
           assignment: bestAssignment,
           wins: bestAssignment.filter((car, idx) => car.bestIn && car.bestIn.includes(currentTypes[idx])).length,
           chemistry: assignedChemistry.total,
-          breakdown: assignedChemistry.breakdown
+          minChemistry: assignedChemistry.minTotal,
+          maxChemistry: assignedChemistry.maxTotal,
+          breakdown: assignedChemistry.breakdown,
+          difficultyLines: assignedChemistry.difficultyLines
         });
 
         const usedNames = new Set(bestHand.map(c => c.name));
@@ -624,7 +648,7 @@
         handDiv.className = 'hand-container';
         handDiv.innerHTML = `
           <div class="flex justify-between items-center mb-6">
-            <div class="text-emerald-400 font-medium">Hand ${idx+1} — Chemistry ${hand.chemistry}</div>
+            <div class="text-emerald-400 font-medium">Hand ${idx+1} — Chemistry ${hand.minChemistry} - ${hand.maxChemistry}</div>
             <div class="text-sm font-medium text-zinc-300">${hand.wins} of 3 wins</div>
           </div>
           <div class="grid grid-cols-3 gap-6">
@@ -655,7 +679,10 @@
               <div>
                 <div class="flex justify-between"><span class="text-zinc-400">Rarity</span><span class="font-mono font-bold text-purple-400">+${hand.breakdown.rarity}</span></div>
                 <div class="flex justify-between"><span class="text-zinc-400">Stars</span><span class="font-mono font-bold text-amber-400">+${hand.breakdown.stars}</span></div>
-                <div class="flex justify-between"><span class="text-zinc-400">Difficulty</span><span class="font-mono font-bold text-rose-400">+${hand.breakdown.difficulty}</span></div>
+                <div>
+                  <div class="text-zinc-400 mb-1">Difficulty</div>
+                  <div class="font-mono font-bold text-rose-400 space-y-1">${(hand.difficultyLines || []).map(line => `<div>${formatScore(line.score)} (${line.wins}x ${line.label} Wins)</div>`).join('')}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -671,12 +698,25 @@
       renderGarage();
     }
 
+    function refreshAutoHandsForDifficulty() {
+      autoHands = autoHands.map(hand => {
+        const assignedTeam = hand.assignment.reduce((acc, car, idx) => {
+          acc[getSlotKey(idx)] = { name: car.name };
+          return acc;
+        }, {});
+        const chem = getChemistry(assignedTeam);
+        return { ...hand, chemistry: chem.total, minChemistry: chem.minTotal, maxChemistry: chem.maxTotal, breakdown: chem.breakdown, difficultyLines: chem.difficultyLines };
+      }).sort((a,b) => b.chemistry - a.chemistry);
+      renderAutoHands();
+    }
+
     // ────────────────────────────────────────────────
     // DIFFICULTY DROPDOWN
     // ────────────────────────────────────────────────
     function changeDifficulty() {
       currentDifficulty = document.getElementById('difficulty-select').value;
       updateAll();
+      if (autoHands.length) refreshAutoHandsForDifficulty();
     }
 
     // ────────────────────────────────────────────────
@@ -711,6 +751,7 @@
         o.value = level; o.textContent = level;
         sel.appendChild(o);
       });
+      if (!difficultyData.levels[currentDifficulty]) currentDifficulty = Object.keys(difficultyData.levels)[0];
       sel.value = currentDifficulty;
     }
 
@@ -750,6 +791,26 @@
       addOptions('filter-country', countries);
       addOptions('filter-manuf', manufs);
       addOptions('filter-bestin', bestIns);
+    }
+
+    function openChangelog() {
+      const container = document.getElementById('changelog-list');
+      container.innerHTML = changelogEntries.map(entry => `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4">
+          <div class="text-sm text-yellow-300 font-semibold mb-1">${entry.version}</div>
+          <div class="text-xs text-zinc-500 mb-2">${entry.date}</div>
+          <ul class="list-disc pl-5 text-sm text-zinc-300 space-y-1">
+            ${entry.changes.map(change => `<li>${change}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('');
+      document.getElementById('changelog-modal').classList.remove('hidden');
+      document.getElementById('changelog-modal').classList.add('flex');
+    }
+
+    function closeChangelog() {
+      document.getElementById('changelog-modal').classList.add('hidden');
+      document.getElementById('changelog-modal').classList.remove('flex');
     }
 
     function loadTrackAndEnv() {

@@ -1,7 +1,19 @@
 {
   "levels": {
-    "Level 1": { "win": 7, "loss": -6 },
-    "Level 2": { "win": 9, "loss": -5 },
-    "Level 3": { "win": 13, "loss": -4 }
+    "Level 1": {
+      "Level 1 Low PWR": { "win": 6, "loss": -5 },
+      "Level 1 Med PWR": { "win": 7, "loss": -6 },
+      "Level 1 High PWR": { "win": 8, "loss": -7 }
+    },
+    "Level 2": {
+      "Level 2 Low PWR": { "win": 8, "loss": -4 },
+      "Level 2 Med PWR": { "win": 9, "loss": -5 },
+      "Level 2 High PWR": { "win": 10, "loss": -6 }
+    },
+    "Level 3": {
+      "Level 3 Low PWR": { "win": 12, "loss": -3 },
+      "Level 3 Med PWR": { "win": 13, "loss": -4 },
+      "Level 3 High PWR": { "win": 14, "loss": -5 }
+    }
   }
 }
