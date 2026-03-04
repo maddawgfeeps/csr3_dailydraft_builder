@@ -197,8 +197,8 @@
     }
 
     function getChemistry(teamObj) {
-      const cars = currentTypes.map(type => {
-        const assigned = teamObj[type];
+      const cars = currentTypes.map((type, index) => {
+        const assigned = teamObj[getSlotKey(index)];
         return assigned ? getEffectiveCar(assigned.name) : null;
       });
       if (cars.some(car => !car)) return { total: 0, breakdown: {} };
@@ -250,6 +250,10 @@
       return carsArray.slice().sort((a, b) => a.name.localeCompare(b.name));
     }
 
+    function getSlotKey(index) {
+      return `slot-${index}`;
+    }
+
     function saveGarageState() {
       localStorage.setItem('csr3UserGarage', JSON.stringify(userGarageData));
       localStorage.setItem('csr3IsCustomGarage', isCustomGarage);
@@ -296,8 +300,8 @@
     function renderSlotsContainer() {
       const container = document.getElementById('slots-container');
       container.innerHTML = '';
-      currentTypes.forEach(type => {
-        const slotId = type.toLowerCase();
+      currentTypes.forEach((type, index) => {
+        const slotId = `${type.toLowerCase()}-${index}`;
         const color = slotColors[type] || "#64748b";
         container.innerHTML += `
           <div>
@@ -306,7 +310,7 @@
               <span id="${slotId}-header" class="font-medium">${type.toUpperCase()} SLOT</span>
             </div>
             <div id="${slotId}-slot" class="slot border-2 border-dashed border-zinc-700 rounded-3xl p-6 flex flex-col items-center justify-center text-center cursor-pointer"
-                 ondrop="drop(event, '${type}')" ondragover="allowDrop(event)" ondragleave="ev=>ev.currentTarget.classList.remove('drag-over')">
+                 ondrop="drop(event, ${index})" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)">
               <div id="${slotId}-content" class="w-full"></div>
               <p id="${slotId}-empty" class="text-zinc-500 text-sm">Drop a car here</p>
             </div>
@@ -314,9 +318,11 @@
       });
     }
 
-    function renderSingleSlot(type) {
-      const slotId = type.toLowerCase();
-      const carName = team[type] ? team[type].name : null;
+    function renderSingleSlot(index) {
+      const type = currentTypes[index];
+      const slotId = `${type.toLowerCase()}-${index}`;
+      const slotKey = getSlotKey(index);
+      const carName = team[slotKey] ? team[slotKey].name : null;
       const header = document.getElementById(`${slotId}-header`);
       const content = document.getElementById(`${slotId}-content`);
       const empty = document.getElementById(`${slotId}-empty`);
@@ -328,7 +334,7 @@
         const card = createCarCard(carName);
         card.classList.remove('cursor-grab');
         card.classList.add('cursor-pointer');
-        card.onclick = () => { delete team[type]; updateAll(); };
+        card.onclick = () => { delete team[slotKey]; updateAll(); };
         content.appendChild(card);
         empty.classList.add('hidden');
       } else {
@@ -337,7 +343,7 @@
       }
     }
 
-    function renderAllSlots() { currentTypes.forEach(renderSingleSlot); }
+    function renderAllSlots() { currentTypes.forEach((_, index) => renderSingleSlot(index)); }
 
     function renderGarage() {
       const container = document.getElementById('garage');
@@ -387,12 +393,13 @@
     // DRAG & DROP + RESET
     // ────────────────────────────────────────────────
     function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+    function handleDragLeave(ev) { ev.currentTarget.classList.remove('drag-over'); }
     function drag(ev) { ev.dataTransfer.setData("carName", ev.currentTarget.dataset.name); }
-    function drop(ev, slotType) {
+    function drop(ev, slotIndex) {
       ev.preventDefault(); ev.currentTarget.classList.remove('drag-over');
       const name = ev.dataTransfer.getData("carName");
       if (Object.values(team).some(c => c?.name === name)) return;
-      team[slotType] = { name };
+      team[getSlotKey(slotIndex)] = { name };
       updateAll();
     }
     function resetTeam() { team = {}; setTeamSelectionVisibility(true); updateAll(); }
@@ -529,7 +536,7 @@
 
     // ────────────────────────────────────────────────
     // AUTO POPULATE HANDS (sorted + difficulty)
-    // ────────────────────────────────────────────────
+    // ───────────────────────────────────────────────
     function autoPopulateHands() {
       autoHands = [];
       let available = sortedCars(allCars).filter(c => {
@@ -556,11 +563,10 @@
                   if (car.bestIn && car.bestIn.includes(type)) wins++;
                 });
 
-                const assignedTeam = {
-                  [currentTypes[0]]: { name: assignment[0].name },
-                  [currentTypes[1]]: { name: assignment[1].name },
-                  [currentTypes[2]]: { name: assignment[2].name }
-                };
+                const assignedTeam = assignment.reduce((acc, car, idx) => {
+                  acc[getSlotKey(idx)] = { name: car.name };
+                  return acc;
+                }, {});
                 const chem = getChemistry(assignedTeam);
                 const score = chem.total;
 
@@ -576,20 +582,19 @@
 
         if (bestScore < 0) break; // safety
 
+        const assignedTeam = bestAssignment.reduce((acc, car, idx) => {
+          acc[getSlotKey(idx)] = { name: car.name };
+          return acc;
+        }, {});
+
+        const assignedChemistry = getChemistry(assignedTeam);
+
         autoHands.push({
           cars: bestHand,
           assignment: bestAssignment,
           wins: bestAssignment.filter((car, idx) => car.bestIn && car.bestIn.includes(currentTypes[idx])).length,
-          chemistry: getChemistry({
-            [currentTypes[0]]: { name: bestAssignment[0].name },
-            [currentTypes[1]]: { name: bestAssignment[1].name },
-            [currentTypes[2]]: { name: bestAssignment[2].name }
-          }).total,
-          breakdown: getChemistry({
-            [currentTypes[0]]: { name: bestAssignment[0].name },
-            [currentTypes[1]]: { name: bestAssignment[1].name },
-            [currentTypes[2]]: { name: bestAssignment[2].name }
-          }).breakdown
+          chemistry: assignedChemistry.total,
+          breakdown: assignedChemistry.breakdown
         });
 
         const usedNames = new Set(bestHand.map(c => c.name));
