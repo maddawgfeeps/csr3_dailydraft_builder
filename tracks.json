@@ -16,7 +16,7 @@
           "types": ["Drag", "Tour", "Sport"]
         },
         "Wet": {
-          "types": ["Drag", "Tour", "Sport"]
+          "types": ["Sport", "Street", "Street"]
         }
       }
     },
