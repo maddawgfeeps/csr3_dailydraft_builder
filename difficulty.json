@@ -1,19 +1,46 @@
 {
   "levels": {
     "Level 1": {
-      "Level 1 Low PWR": { "win": 6, "loss": -5 },
-      "Level 1 Med PWR": { "win": 7, "loss": -6 },
-      "Level 1 High PWR": { "win": 8, "loss": -7 }
+      "wins < 7k pwr - level 1 difficulty": {
+        "win": 6,
+        "loss": -5
+      },
+      "wins between 7k - 8k pwr - level 1 difficulty": {
+        "win": 7,
+        "loss": -6
+      },
+      "wins > 8k pwr - level 1 difficulty": {
+        "win": 8,
+        "loss": -7
+      }
     },
     "Level 2": {
-      "Level 2 Low PWR": { "win": 8, "loss": -4 },
-      "Level 2 Med PWR": { "win": 9, "loss": -5 },
-      "Level 2 High PWR": { "win": 10, "loss": -6 }
+      "wins < 7k pwr - level 2 difficulty": {
+        "win": 8,
+        "loss": -4
+      },
+      "wins between 7k - 8k pwr - level 2 difficulty": {
+        "win": 9,
+        "loss": -5
+      },
+      "wins > 8k pwr - level 2 difficulty": {
+        "win": 10,
+        "loss": -6
+      }
     },
     "Level 3": {
-      "Level 3 Low PWR": { "win": 12, "loss": -3 },
-      "Level 3 Med PWR": { "win": 13, "loss": -4 },
-      "Level 3 High PWR": { "win": 14, "loss": -5 }
+      "wins < 7k pwr - level 3 difficulty": {
+        "win": 12,
+        "loss": -3
+      },
+      "wins between 7k - 8k pwr - level 3 difficulty": {
+        "win": 13,
+        "loss": -4
+      },
+      "wins > 8k pwr - level 3 difficulty": {
+        "win": 14,
+        "loss": -5
+      }
     }
   }
 }

@@ -3,32 +3,168 @@
     "Los Angeles": {
       "environments": {
         "Dry": {
-          "types": ["Drag", "Street", "Sport"]
+          "types": [
+            "Drag",
+            "Street",
+            "Sport"
+          ]
         },
         "Wet": {
-          "types": ["Drag", "Drag", "Track"]
+          "types": [
+            "Drag",
+            "Drag",
+            "Track"
+          ]
         }
       }
     },
     "Amalfi Coast": {
       "environments": {
         "Dry": {
-          "types": ["Street", "Tour", "Sport"]
+          "types": [
+            "Street",
+            "Tour",
+            "Sport"
+          ]
         },
         "Wet": {
-          "types": ["Sport", "Street", "Street"]
+          "types": [
+            "Sport",
+            "Street",
+            "Street"
+          ]
         }
       }
     },
     "Tokyo": {
       "environments": {
         "Dry": {
-          "types": ["Sport", "Street", "Tour"]
+          "types": [
+            "Sport",
+            "Street",
+            "Tour"
+          ]
         },
         "Wet": {
-          "types": ["Sport", "Street", "Tour"]
+          "types": [
+            "Sport",
+            "Street",
+            "Tour"
+          ]
         }
       }
+    }
+  },
+  "slotCompatibility": {
+    "Dry": {
+      "Tour": {
+        "Tour": [
+          "Perfect"
+        ],
+        "Track": [
+          "Good",
+          "Okay"
+        ],
+        "Street": [
+          "Good",
+          "Okay"
+        ],
+        "Sport": [
+          "Bad"
+        ],
+        "Drag": [
+          "Terrible"
+        ]
+      },
+      "Drag": {
+        "Drag": [
+          "Perfect"
+        ],
+        "Tour": [
+          "Okay",
+          "Bad",
+          "Terrible"
+        ],
+        "Sport": [
+          "Bad",
+          "Terrible"
+        ],
+        "Street": [
+          "Okay",
+          "Bad"
+        ],
+        "Track": [
+          "Bad",
+          "Terrible"
+        ]
+      },
+      "Track": {
+        "Drag": [
+          "Terrible"
+        ],
+        "Tour": [
+          "Good",
+          "Okay",
+          "Bad"
+        ],
+        "Sport": [
+          "Good",
+          "Okay"
+        ],
+        "Street": [
+          "Good",
+          "Okay"
+        ],
+        "Track": [
+          "Perfect"
+        ]
+      },
+      "Sport": {},
+      "Street": {
+        "Drag": [
+          "Bad"
+        ],
+        "Tour": [
+          "Perfect",
+          "Terrible"
+        ],
+        "Sport": [
+          "Bad",
+          "Terrible"
+        ],
+        "Street": [
+          "Perfect",
+          "Good"
+        ],
+        "Track": [
+          "Good",
+          "Okay"
+        ]
+      }
+    },
+    "Wet": {
+      "Tour": {},
+      "Drag": {},
+      "Track": {},
+      "Sport": {
+        "Drag": [
+          "Terrible"
+        ],
+        "Tour": [
+          "Terrible"
+        ],
+        "Sport": [
+          "Perfect"
+        ],
+        "Street": [
+          "Good"
+        ],
+        "Track": [
+          "Good",
+          "Okay"
+        ]
+      },
+      "Street": {}
     }
   }
 }

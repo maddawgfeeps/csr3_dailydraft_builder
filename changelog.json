@@ -1,8 +1,16 @@
 {
   "entries": [
     {
-      "version": "v0.0.2",
+      "version": "v0.0.3",
       "date": "Current",
+      "changes": [
+        "Reworded Level 1 difficulty chemistry labels to use clear power ranges: < 7k, 7k-8k, and > 8k pwr.",
+        "Updated Build label to v0.0.3."
+      ]
+    },
+    {
+      "version": "v0.0.2",
+      "date": "Previous",
       "changes": [
         "Moved changelog data to changelog.json so updates no longer require HTML edits.",
         "Manual Chemistry Breakdown now starts minimized and smoothly expands once all 3 slots are filled.",

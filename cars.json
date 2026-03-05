@@ -6,7 +6,15 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Ferrari",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Aston Martin DBS Coupe",
@@ -14,7 +22,16 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Aston Martin",
-      "bestIn": ["Street", "Tour"]
+      "bestIn": [
+        "Street",
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Porsche 911 Carrera 4S (992)",
@@ -22,7 +39,16 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Porsche",
-      "bestIn": ["Street", "Tour"]
+      "bestIn": [
+        "Street",
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Ford Mustang Dark Horse",
@@ -30,7 +56,15 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Ford",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Ferrari Roma",
@@ -38,7 +72,15 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Ferrari",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Chevrolet Stingray",
@@ -46,7 +88,15 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Chevrolet",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "BMW M4 Competition",
@@ -54,7 +104,15 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "BMW",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Ferrari SF90 Stradale",
@@ -62,7 +120,12 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Ferrari",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Aston Martin DB12",
@@ -70,7 +133,12 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Aston Martin",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Nissan Z Nismo (RZ34)",
@@ -78,7 +146,12 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Nissan",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Nissan GT-R (R35)",
@@ -86,7 +159,12 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Nissan",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Lamborghini Huracan Evo",
@@ -94,7 +172,12 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Lamborghini",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Audi RS 5 Coupe",
@@ -102,7 +185,12 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Audi",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Acura NSX Type S",
@@ -110,7 +198,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Acura",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Porsche 911 GT3 RS (992)",
@@ -118,7 +211,14 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Porsche",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Porsche 718 Cayman GT4",
@@ -126,7 +226,14 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Porsche",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Jaguar XE SV Project 8",
@@ -134,7 +241,14 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Jaguar",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Aston Martin V12 Vantage",
@@ -142,7 +256,14 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Aston Martin",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Alpine A110 S",
@@ -150,7 +271,14 @@
       "stars": "1 Star",
       "country": "French",
       "manufacturer": "Alpine",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Alfa Romeo Giulia GTAm",
@@ -158,7 +286,14 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Alfa Romeo",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Ferrari 812 Competizione",
@@ -166,7 +301,12 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Ferrari",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Mclaren 765LT",
@@ -174,7 +314,12 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Mclaren",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Toyota GR Supra",
@@ -182,7 +327,12 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Toyota",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Ford Mustang Shelby GT500",
@@ -190,7 +340,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Ford",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Dodge Challenger R/T Scat Pack Widebody",
@@ -198,7 +353,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Dodge",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Chevrolet CT5-V Blackwing",
@@ -206,7 +366,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Chevrolet",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "BMW M2 Coupe",
@@ -214,7 +379,12 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "BMW",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Ford Ruffian Mustang 70",
@@ -222,7 +392,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Ford",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Dodge Charger SRT Hellcat Redeye",
@@ -230,7 +405,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Dodge",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Hennessey Venom F5",
@@ -238,7 +418,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Hennessey",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Koenigsegg Jesko Absolut",
@@ -246,7 +431,12 @@
       "stars": "1 Star",
       "country": "Swedish",
       "manufacturer": "Koenigsegg",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Mclaren Speedtail",
@@ -254,7 +444,12 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Mclaren",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "Dodge Challenger SRT Demon",
@@ -262,7 +457,12 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Dodge",
-      "bestIn": ["Drag"]
+      "bestIn": [
+        "Drag"
+      ],
+      "substituteIn": [
+        "Drag"
+      ]
     },
     {
       "name": "BMW M5 CS",
@@ -270,7 +470,15 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "BMW",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Lotus Emira First Edition",
@@ -278,7 +486,15 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Lotus",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Lexus LC500",
@@ -286,7 +502,15 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Lexus",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Jaguar F-Type R Coupe",
@@ -294,7 +518,15 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Jaguar",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Audi RS 6 Avant",
@@ -302,7 +534,15 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Audi",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Toyota GR Yaris",
@@ -310,7 +550,15 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Toyota",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Pagani Utopia",
@@ -318,7 +566,15 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Pagani",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Maserati MC20",
@@ -326,7 +582,15 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Maserati",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Porsche 911 Turbo S (992)",
@@ -334,7 +598,15 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Porsche",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Bentley Continental GT Speed",
@@ -342,7 +614,15 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Bentley",
-      "bestIn": ["Tour"]
+      "bestIn": [
+        "Tour"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Bugatti Chiron Sport",
@@ -350,7 +630,15 @@
       "stars": "1 Star",
       "country": "French",
       "manufacturer": "Bugatti",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Lamborghini Revuelto",
@@ -358,7 +646,15 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Lamborghini",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Lexus LFA",
@@ -366,7 +662,15 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Lexus",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Mclaren Artura",
@@ -374,7 +678,15 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Mclaren",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Apollo Intensa Emozione",
@@ -382,7 +694,15 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Apollo",
-      "bestIn": ["Street"]
+      "bestIn": [
+        "Street"
+      ],
+      "substituteIn": [
+        "Drag",
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Lamborghini Aventador SVJ",
@@ -390,7 +710,12 @@
       "stars": "1 Star",
       "country": "Italian",
       "manufacturer": "Lamborghini",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Nissan GT-R Nismo (R35)",
@@ -398,7 +723,12 @@
       "stars": "1 Star",
       "country": "Japanise",
       "manufacturer": "Nissan",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Audi R8 Coupe V10 Performance Quattro",
@@ -406,7 +736,12 @@
       "stars": "1 Star",
       "country": "German",
       "manufacturer": "Audi",
-      "bestIn": ["Sport"]
+      "bestIn": [
+        "Sport"
+      ],
+      "substituteIn": [
+        "Track"
+      ]
     },
     {
       "name": "Aston Martin Valkyrie",
@@ -414,7 +749,14 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Aston Martin",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Mclaren Senna",
@@ -422,7 +764,14 @@
       "stars": "1 Star",
       "country": "British",
       "manufacturer": "Mclaren",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Dodge Viper ACR Extreme Aero",
@@ -430,7 +779,14 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Dodge",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Ford GT",
@@ -438,7 +794,14 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Ford",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Chevrolet Camaro ZL1 1LE",
@@ -446,7 +809,14 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Chevrolet",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     },
     {
       "name": "Chevrolet Corvette Z06",
@@ -454,7 +824,14 @@
       "stars": "1 Star",
       "country": "American",
       "manufacturer": "Chevrolet",
-      "bestIn": ["Track"]
+      "bestIn": [
+        "Track"
+      ],
+      "substituteIn": [
+        "Street",
+        "Tour",
+        "Track"
+      ]
     }
   ]
 }

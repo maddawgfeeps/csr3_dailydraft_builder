@@ -38,6 +38,15 @@
       opacity: 0;
       transform: translateY(10px);
     }
+    .fade-panel {
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-panel.is-fading {
+      opacity: 0;
+      transform: translateY(12px);
+    }
   </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -84,7 +93,7 @@
       <div class="col-span-12 lg:col-span-7">
         <h2 class="text-xl font-semibold mb-4 flex items-center gap-4">
           <span>Your Team</span>
-          <button onclick="resetTeam()" class="ml-auto px-5 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium">Reset Team</button>
+          <button id="reset-team-btn" onclick="resetTeam()" class="ml-auto px-5 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium transition-all duration-300">Reset Team</button>
           <button onclick="autoPopulateHands()" class="px-5 py-1.5 text-sm bg-emerald-600 hover:bg-emerald-500 rounded-xl font-medium">Auto Populate</button>
           <span id="chemistry-score" class="text-3xl font-bold text-yellow-400">0 - 0</span>
           <span id="chemistry-label" class="text-sm text-zinc-500 font-normal">CHEMISTRY (Range)</span>
@@ -115,9 +124,9 @@
         </div>
 
         <!-- Auto-Populated Hands -->
-        <div id="auto-hands-section" class="mt-12 hidden">
+        <div id="auto-hands-section" class="mt-12 hidden fade-panel">
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold">Auto-Populated Winning Hands</h3>
+            <h3 id="auto-hands-title" class="text-lg font-semibold">Auto-Populated Winning Hands</h3>
             <button onclick="clearAutoHands()" class="text-xs px-5 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Clear All Hands</button>
           </div>
           <div id="auto-hands" class="space-y-10"></div>
@@ -208,6 +217,8 @@
 
     let filters = { rarity: 'All', stars: 'All', country: 'All', manufacturer: 'All', bestIn: 'All' };
     let autoHands = [];
+    const gradePriority = { "Terrible": 0, "Bad": 1, "Okay": 2, "Good": 3, "Perfect": 4 };
+    const gradeAdjustment = { "Perfect": 0, "Good": 7, "Okay": 4, "Bad": 0, "Terrible": 0 };
 
     let changelogEntries = [];
 
@@ -225,6 +236,30 @@
     function getDifficultyVariantsForCurrentLevel() {
       const selected = difficultyData.levels[currentDifficulty] || {};
       return Object.entries(selected).map(([label, values]) => ({ label, ...values }));
+    }
+
+    function getGradeLabel(type, car) {
+      if (!car || !Array.isArray(car.bestIn) || !car.bestIn.length) return 'Terrible';
+      const envGrades = tracksData?.slotCompatibility?.[currentEnv]?.[type] || {};
+      let bestGrade = 'Terrible';
+      car.bestIn.forEach(primaryType => {
+        const gradeOrList = envGrades[primaryType];
+        const gradeList = Array.isArray(gradeOrList) ? gradeOrList : (gradeOrList ? [gradeOrList] : []);
+        gradeList.forEach(grade => {
+          if ((gradePriority[grade] || 0) > (gradePriority[bestGrade] || 0)) bestGrade = grade;
+        });
+      });
+      return bestGrade;
+    }
+
+    function getSlotOutcome(type, car) {
+      const grade = getGradeLabel(type, car);
+      return {
+        grade,
+        isWin: grade === 'Perfect',
+        isViable: grade === 'Perfect' || grade === 'Good' || grade === 'Okay',
+        difficultyAdjustment: gradeAdjustment[grade] || 0
+      };
     }
 
     function getChemistry(teamObj) {
@@ -258,14 +293,13 @@
       Object.entries(stars).forEach(([level,n]) => { if (n>=2 && starBonuses[level]) starsScore += starBonuses[level][n]||0; });
       baseTotal += starsScore; breakdown.stars = starsScore;
 
-      const wins = currentTypes.reduce((acc, type, i) => {
-        const car = cars[i];
-        return acc + ((car.bestIn && car.bestIn.includes(type)) ? 1 : 0);
-      }, 0);
+      const slotOutcomes = currentTypes.map((type, i) => getSlotOutcome(type, cars[i]));
+      const wins = slotOutcomes.filter(outcome => outcome.isWin).length;
       const losses = currentTypes.length - wins;
+      const substituteBonus = slotOutcomes.reduce((acc, outcome) => acc + outcome.difficultyAdjustment, 0);
 
       const difficultyLines = getDifficultyVariantsForCurrentLevel().map(variant => {
-        const score = wins * variant.win + losses * variant.loss;
+        const score = wins * variant.win + losses * variant.loss + substituteBonus;
         return { label: variant.label, wins, score };
       });
 
@@ -303,6 +337,27 @@
     function updateGarageHeaderAndButton() {
       document.getElementById('garage-header').textContent = isCustomGarage ? 'My Garage' : 'Default Garage';
       document.getElementById('garage-mode-text').textContent = isCustomGarage ? 'Use Default Garage' : 'Use My Garage';
+      updateAutoHandsHeader();
+    }
+
+    function updateAutoHandsHeader() {
+      const title = document.getElementById('auto-hands-title');
+      if (!title) return;
+      title.textContent = isCustomGarage
+        ? 'Auto-Populated Winning Hands With My Garage'
+        : 'Auto-Populated Winning Hands With Default Garage';
+    }
+
+    function setResetButtonVisibility(show) {
+      const resetBtn = document.getElementById('reset-team-btn');
+      if (!resetBtn) return;
+      if (show) {
+        resetBtn.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-1', 'w-0', 'overflow-hidden', 'px-0', 'ml-0');
+        resetBtn.classList.add('opacity-100');
+      } else {
+        resetBtn.classList.add('opacity-0', 'pointer-events-none', '-translate-y-1', 'w-0', 'overflow-hidden', 'px-0', 'ml-0');
+        resetBtn.classList.remove('opacity-100');
+      }
     }
 
     // ────────────────────────────────────────────────
@@ -361,8 +416,8 @@
       content.innerHTML = '';
       if (carName) {
         const car = getEffectiveCar(carName);
-        const isWin = car.bestIn && car.bestIn.includes(type);
-        header.innerHTML = `${type.toUpperCase()} SLOT <span class="${isWin ? 'win' : 'loss'}"> - ${isWin ? 'Win' : 'Loss'}</span>`;
+        const slotOutcome = getSlotOutcome(type, car);
+        header.innerHTML = `${type.toUpperCase()} SLOT <span class="${slotOutcome.isWin ? 'win' : 'loss'}"> - ${slotOutcome.grade}</span>`;
         const card = createCarCard(carName);
         card.classList.remove('cursor-grab');
         card.classList.add('cursor-pointer');
@@ -459,6 +514,9 @@
       updateGarageHeaderAndButton();
       saveGarageState();
       updateAll();
+      if (autoHands.length) {
+        await autoPopulateHands({ smoothTransition: true });
+      }
       requestAnimationFrame(() => garageList?.classList.remove('is-fading'));
     }
 
@@ -576,86 +634,104 @@
     // ────────────────────────────────────────────────
     // AUTO POPULATE HANDS (sorted + difficulty)
     // ───────────────────────────────────────────────
-    function autoPopulateHands() {
-      autoHands = [];
-      let available = sortedCars(allCars).filter(c => {
-        const userData = userGarageData[c.name] || {};
-        return isCustomGarage ? userData.owned : true;
-      });
+    function autoPopulateHands(options = {}) {
+      const { smoothTransition = false } = options;
+      const runPopulation = () => {
+        autoHands = [];
+        let available = sortedCars(allCars).filter(c => {
+          const userData = userGarageData[c.name] || {};
+          return isCustomGarage ? userData.owned : true;
+        });
 
-      while (available.length >= 3) {
-        let bestScore = -Infinity;
-        let bestHand = null;
-        let bestAssignment = null;
+        while (available.length >= 3) {
+          let bestScore = -Infinity;
+          let bestHand = null;
+          let bestAssignment = null;
 
-        for (let i = 0; i < available.length - 2; i++) {
-          for (let j = i + 1; j < available.length - 1; j++) {
-            for (let k = j + 1; k < available.length; k++) {
-              const trio = [available[i], available[j], available[k]];
+          for (let i = 0; i < available.length - 2; i++) {
+            for (let j = i + 1; j < available.length - 1; j++) {
+              for (let k = j + 1; k < available.length; k++) {
+                const trio = [available[i], available[j], available[k]];
 
-              const perms = [[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
-              for (let perm of perms) {
-                const assignment = perm.map(idx => trio[idx]);
-                let wins = 0;
-                currentTypes.forEach((type, slotIdx) => {
-                  const car = assignment[slotIdx];
-                  if (car.bestIn && car.bestIn.includes(type)) wins++;
-                });
+                const perms = [[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+                for (let perm of perms) {
+                  const assignment = perm.map(idx => trio[idx]);
+                  const slotOutcomes = currentTypes.map((type, slotIdx) => getSlotOutcome(type, assignment[slotIdx]));
+                  const viableSlots = slotOutcomes.filter(outcome => outcome.isViable).length;
 
-                const assignedTeam = assignment.reduce((acc, car, idx) => {
-                  acc[getSlotKey(idx)] = { name: car.name };
-                  return acc;
-                }, {});
-                const chem = getChemistry(assignedTeam);
-                const score = chem.total;
+                  const assignedTeam = assignment.reduce((acc, car, idx) => {
+                    acc[getSlotKey(idx)] = { name: car.name };
+                    return acc;
+                  }, {});
+                  const chem = getChemistry(assignedTeam);
+                  const score = chem.total;
 
-                if (wins >= 2 && score > bestScore) {
-                  bestScore = score;
-                  bestHand = trio;
-                  bestAssignment = assignment;
+                  if (viableSlots >= 2 && score > bestScore) {
+                    bestScore = score;
+                    bestHand = trio;
+                    bestAssignment = assignment;
+                  }
                 }
               }
             }
           }
+
+          if (bestScore < 0) break;
+
+          const assignedTeam = bestAssignment.reduce((acc, car, idx) => {
+            acc[getSlotKey(idx)] = { name: car.name };
+            return acc;
+          }, {});
+
+          const assignedChemistry = getChemistry(assignedTeam);
+          const slotOutcomes = currentTypes.map((type, idx) => getSlotOutcome(type, bestAssignment[idx]));
+
+          autoHands.push({
+            cars: bestHand,
+            assignment: bestAssignment,
+            wins: slotOutcomes.filter(outcome => outcome.isWin).length,
+            viableSlots: slotOutcomes.filter(outcome => outcome.isViable).length,
+            chemistry: assignedChemistry.total,
+            minChemistry: assignedChemistry.minTotal,
+            maxChemistry: assignedChemistry.maxTotal,
+            breakdown: assignedChemistry.breakdown,
+            difficultyLines: assignedChemistry.difficultyLines
+          });
+
+          const usedNames = new Set(bestHand.map(c => c.name));
+          available = available.filter(c => !usedNames.has(c.name));
         }
 
-        if (bestScore < 0) break; // safety
+        autoHands.sort((a,b) => b.chemistry - a.chemistry);
 
-        const assignedTeam = bestAssignment.reduce((acc, car, idx) => {
-          acc[getSlotKey(idx)] = { name: car.name };
-          return acc;
-        }, {});
+        renderAutoHands();
+        const section = document.getElementById('auto-hands-section');
+        if (autoHands.length > 0) {
+          section.classList.remove('hidden');
+          setTeamSelectionVisibility(false);
+          setResetButtonVisibility(false);
+        } else {
+          section.classList.add('hidden');
+          setTeamSelectionVisibility(true);
+          setResetButtonVisibility(true);
+        }
+        renderGarage();
+      };
 
-        const assignedChemistry = getChemistry(assignedTeam);
-
-        autoHands.push({
-          cars: bestHand,
-          assignment: bestAssignment,
-          wins: bestAssignment.filter((car, idx) => car.bestIn && car.bestIn.includes(currentTypes[idx])).length,
-          chemistry: assignedChemistry.total,
-          minChemistry: assignedChemistry.minTotal,
-          maxChemistry: assignedChemistry.maxTotal,
-          breakdown: assignedChemistry.breakdown,
-          difficultyLines: assignedChemistry.difficultyLines
+      if (smoothTransition && !document.getElementById('auto-hands-section').classList.contains('hidden')) {
+        const section = document.getElementById('auto-hands-section');
+        section.classList.add('is-fading');
+        return new Promise(resolve => {
+          setTimeout(() => {
+            runPopulation();
+            section.classList.remove('is-fading');
+            resolve();
+          }, 220);
         });
-
-        const usedNames = new Set(bestHand.map(c => c.name));
-        available = available.filter(c => !usedNames.has(c.name));
       }
 
-      // Sort by chemistry descending
-      autoHands.sort((a,b) => b.chemistry - a.chemistry);
-
-      renderAutoHands();
-      const section = document.getElementById('auto-hands-section');
-      if (autoHands.length > 0) {
-        section.classList.remove('hidden');
-        setTeamSelectionVisibility(false);
-      } else {
-        section.classList.add('hidden');
-        setTeamSelectionVisibility(true);
-      }
-      renderGarage();
+      runPopulation();
+      return Promise.resolve();
     }
 
     function renderAutoHands() {
@@ -667,12 +743,12 @@
         handDiv.innerHTML = `
           <div class="flex justify-between items-center mb-6">
             <div class="text-emerald-400 font-medium">Hand ${idx+1} — Chemistry ${hand.minChemistry} - ${hand.maxChemistry}</div>
-            <div class="text-sm font-medium text-zinc-300">${hand.wins} of 3 wins</div>
+            <div class="text-sm font-medium text-zinc-300">${hand.viableSlots || hand.wins} of 3 viable slots</div>
           </div>
           <div class="grid grid-cols-3 gap-6">
             ${currentTypes.map((type, i) => {
               const car = hand.assignment[i];
-              const isWin = car.bestIn && car.bestIn.includes(type);
+              const slotOutcome = getSlotOutcome(type, car);
               return `
                 <div>
                   <div class="text-xs uppercase tracking-widest text-zinc-500 mb-2 flex items-center gap-2">
@@ -682,7 +758,7 @@
                   <div class="slot border-2 border-dashed border-zinc-700 rounded-3xl p-6">
                     ${createCarCard(car.name).outerHTML}
                   </div>
-                  <div class="text-center mt-2 ${isWin ? 'win' : 'loss'} text-sm">${isWin ? 'Win' : 'Loss'}</div>
+                  <div class="text-center mt-2 ${slotOutcome.isWin ? 'win' : 'loss'} text-sm">${slotOutcome.grade}</div>
                 </div>`;
             }).join('')}
           </div>
@@ -718,6 +794,7 @@
       }, {});
       document.getElementById('auto-hands-section').classList.add('hidden');
       setTeamSelectionVisibility(true);
+      setResetButtonVisibility(true);
       updateAll();
       renderGarage();
     }
@@ -726,6 +803,7 @@
       autoHands = [];
       document.getElementById('auto-hands-section').classList.add('hidden');
       setTeamSelectionVisibility(true);
+      setResetButtonVisibility(true);
       renderGarage();
     }
 
@@ -736,7 +814,17 @@
           return acc;
         }, {});
         const chem = getChemistry(assignedTeam);
-        return { ...hand, chemistry: chem.total, minChemistry: chem.minTotal, maxChemistry: chem.maxTotal, breakdown: chem.breakdown, difficultyLines: chem.difficultyLines };
+        const slotOutcomes = currentTypes.map((type, idx) => getSlotOutcome(type, hand.assignment[idx]));
+        return {
+          ...hand,
+          wins: slotOutcomes.filter(outcome => outcome.isWin).length,
+          viableSlots: slotOutcomes.filter(outcome => outcome.isViable).length,
+          chemistry: chem.total,
+          minChemistry: chem.minTotal,
+          maxChemistry: chem.maxTotal,
+          breakdown: chem.breakdown,
+          difficultyLines: chem.difficultyLines
+        };
       }).sort((a,b) => b.chemistry - a.chemistry);
       renderAutoHands();
     }
