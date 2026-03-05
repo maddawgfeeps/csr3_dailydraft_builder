@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "version": "v0.0.2",
+      "date": "Current",
+      "changes": [
+        "Moved changelog data to changelog.json so updates no longer require HTML edits.",
+        "Manual Chemistry Breakdown now starts minimized and smoothly expands once all 3 slots are filled.",
+        "Manual Chemistry Breakdown smoothly collapses again when team is reset or drops below 3 assigned cars.",
+        "Garage list now fades out and back in when switching between Use Default Garage and Use My Garage."
+      ]
+    },
+    {
+      "version": "v0.0.1",
+      "date": "Previous",
+      "changes": [
+        "Added clickable build version under TEAM BUILDER with in-app changelog modal.",
+        "Difficulty now supports Low / Med / High PWR profiles for each level.",
+        "Chemistry now displays a range and detailed difficulty outcomes per selected level.",
+        "Auto-populated hands now refresh chemistry/range when difficulty level changes.",
+        "Removed duplicate Use Default Garage button; single toggle remains."
+      ]
+    }
+  ]
+}

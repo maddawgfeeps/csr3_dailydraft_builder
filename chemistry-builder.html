@@ -29,6 +29,15 @@
       transform: translateY(-14px);
       margin-top: 0 !important;
     }
+    .garage-list-transition {
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .garage-list-transition.is-fading {
+      opacity: 0;
+      transform: translateY(10px);
+    }
   </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -39,7 +48,7 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.1 © MaddawgFeeps</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.2 © MaddawgFeeps</button>
       </div>
     </div>
   </div>
@@ -85,18 +94,20 @@
 
           <!-- Breakdown -->
           <div class="mt-8 bg-zinc-900 rounded-3xl p-6">
-            <h3 class="text-sm uppercase text-zinc-400 mb-4">Chemistry Breakdown</h3>
-            <div class="grid grid-cols-2 gap-6 text-sm">
-              <div class="space-y-2">
-                <div class="flex justify-between"><span class="text-zinc-400">Manufacturer</span><span id="manuf-bonus" class="font-mono font-bold text-emerald-400">+0</span></div>
-                <div class="flex justify-between"><span class="text-zinc-400">Country</span><span id="country-bonus" class="font-mono font-bold text-sky-400">+0</span></div>
-              </div>
-              <div class="space-y-2">
-                <div class="flex justify-between"><span class="text-zinc-400">Rarity</span><span id="rarity-bonus" class="font-mono font-bold text-purple-400">+0</span></div>
-                <div class="flex justify-between"><span class="text-zinc-400">Stars</span><span id="stars-bonus" class="font-mono font-bold text-amber-400">+0</span></div>
-                <div>
-                  <div class="text-zinc-400 mb-1">Difficulty</div>
-                  <div id="difficulty-bonus" class="font-mono font-bold text-rose-400 space-y-1">+0</div>
+            <h3 class="text-sm uppercase text-zinc-400">Chemistry Breakdown</h3>
+            <div id="chemistry-breakdown-panel" class="collapsible-panel collapsed mt-4">
+              <div class="grid grid-cols-2 gap-6 text-sm">
+                <div class="space-y-2">
+                  <div class="flex justify-between"><span class="text-zinc-400">Manufacturer</span><span id="manuf-bonus" class="font-mono font-bold text-emerald-400">+0</span></div>
+                  <div class="flex justify-between"><span class="text-zinc-400">Country</span><span id="country-bonus" class="font-mono font-bold text-sky-400">+0</span></div>
+                </div>
+                <div class="space-y-2">
+                  <div class="flex justify-between"><span class="text-zinc-400">Rarity</span><span id="rarity-bonus" class="font-mono font-bold text-purple-400">+0</span></div>
+                  <div class="flex justify-between"><span class="text-zinc-400">Stars</span><span id="stars-bonus" class="font-mono font-bold text-amber-400">+0</span></div>
+                  <div>
+                    <div class="text-zinc-400 mb-1">Difficulty</div>
+                    <div id="difficulty-bonus" class="font-mono font-bold text-rose-400 space-y-1">+0</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -130,7 +141,7 @@
           <select id="filter-bestin" onchange="applyFilters()" class="bg-zinc-800 text-white px-3 py-2 rounded-xl border border-zinc-700"></select>
         </div>
 
-        <div id="garage" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+        <div id="garage" class="garage-list-transition grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
       </div>
     </div>
   </div>
@@ -198,15 +209,7 @@
     let filters = { rarity: 'All', stars: 'All', country: 'All', manufacturer: 'All', bestIn: 'All' };
     let autoHands = [];
 
-    const changelogEntries = [
-      { version: 'v0.0.1', date: 'Current', changes: [
-        'Added clickable build version under TEAM BUILDER with in-app changelog modal.',
-        'Difficulty now supports Low / Med / High PWR profiles for each level.',
-        'Chemistry now displays a range and detailed difficulty outcomes per selected level.',
-        'Auto-populated hands now refresh chemistry/range when difficulty level changes.',
-        'Removed duplicate Use Default Garage button; single toggle remains.'
-      ]}
-    ];
+    let changelogEntries = [];
 
     // ────────────────────────────────────────────────
     // CHEMISTRY (now includes Difficulty)
@@ -405,6 +408,16 @@
       panel.classList.toggle('collapsed', !show);
     }
 
+    function setChemistryBreakdownVisibility(show) {
+      const panel = document.getElementById('chemistry-breakdown-panel');
+      if (!panel) return;
+      panel.classList.toggle('collapsed', !show);
+    }
+
+    function getAssignedCarCount() {
+      return Object.values(team).filter(car => car?.name).length;
+    }
+
     function updateAll() {
       renderAllSlots();
       renderGarage();
@@ -417,6 +430,7 @@
       document.getElementById('stars-bonus').textContent   = formatScore(chem.breakdown.stars || 0);
       const difficultyEl = document.getElementById('difficulty-bonus');
       difficultyEl.innerHTML = (chem.difficultyLines || []).map(line => `<div>${formatScore(line.score)} (${line.wins}x ${line.label} Wins)</div>`).join('') || '+0';
+      setChemistryBreakdownVisibility(getAssignedCarCount() >= currentTypes.length && currentTypes.length > 0);
     }
 
     // ────────────────────────────────────────────────
@@ -437,11 +451,15 @@
     // ────────────────────────────────────────────────
     // GARAGE MODE
     // ────────────────────────────────────────────────
-    function toggleGarageMode() {
+    async function toggleGarageMode() {
+      const garageList = document.getElementById('garage');
+      garageList?.classList.add('is-fading');
+      await new Promise(resolve => setTimeout(resolve, 220));
       isCustomGarage = !isCustomGarage;
       updateGarageHeaderAndButton();
       saveGarageState();
       updateAll();
+      requestAnimationFrame(() => garageList?.classList.remove('is-fading'));
     }
 
     // ────────────────────────────────────────────────
@@ -691,6 +709,19 @@
       });
     }
 
+    function applyHand(index) {
+      const hand = autoHands[index];
+      if (!hand) return;
+      team = hand.assignment.reduce((acc, car, idx) => {
+        acc[getSlotKey(idx)] = { name: car.name };
+        return acc;
+      }, {});
+      document.getElementById('auto-hands-section').classList.add('hidden');
+      setTeamSelectionVisibility(true);
+      updateAll();
+      renderGarage();
+    }
+
     function clearAutoHands() {
       autoHands = [];
       document.getElementById('auto-hands-section').classList.add('hidden');
@@ -727,6 +758,9 @@
         const t = await fetch('./tracks.json'); tracksData = await t.json();
         const c = await fetch('./cars.json'); const d = await c.json(); allCars = d.cars;
         const diff = await fetch('./difficulty.json'); difficultyData = await diff.json();
+        const changelog = await fetch('./changelog.json');
+        const changelogData = await changelog.json();
+        changelogEntries = changelogData.entries || [];
 
         populateSelectors();
         currentTrack = Object.keys(tracksData.tracks)[0];
