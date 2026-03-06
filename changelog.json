@@ -1,8 +1,19 @@
 {
   "entries": [
     {
-      "version": "v0.0.3",
+      "version": "v0.0.4",
       "date": "Current",
+      "changes": [
+        "Auto-Populated results now clearly show whether they were generated with My Garage or Default Garage.",
+        "Switching garage mode while Auto-Populated hands are visible now smoothly re-runs and refreshes those hands.",
+        "Reset Team now transitions away while Auto-Populated hands are shown and returns after Clear All Hands.",
+        "Added track-slot compatibility grading support (Perfect/Good/Okay/Bad/Terrible), including placeholders for missing Wet/Dry variants.",
+        "Cars now include substitute compatibility metadata so backup type viability can be modeled alongside best-in types."
+      ]
+    },
+    {
+      "version": "v0.0.3",
+      "date": "Previous",
       "changes": [
         "Reworded Level 1 difficulty chemistry labels to use clear power ranges: < 7k, 7k-8k, and > 8k pwr.",
         "Updated Build label to v0.0.3."

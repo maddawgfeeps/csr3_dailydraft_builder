@@ -57,7 +57,7 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.2 © MaddawgFeeps</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.4 © MaddawgFeeps</button>
       </div>
     </div>
   </div>
@@ -238,9 +238,15 @@
       return Object.entries(selected).map(([label, values]) => ({ label, ...values }));
     }
 
+    function getSlotGradeMatrix(type) {
+      const envCompatibility = tracksData?.slotCompatibility?.[currentEnv]?.[type];
+      if (envCompatibility && Object.keys(envCompatibility).length > 0) return envCompatibility;
+      return tracksData?.slotCompatibility?.Dry?.[type] || {};
+    }
+
     function getGradeLabel(type, car) {
       if (!car || !Array.isArray(car.bestIn) || !car.bestIn.length) return 'Terrible';
-      const envGrades = tracksData?.slotCompatibility?.[currentEnv]?.[type] || {};
+      const envGrades = getSlotGradeMatrix(type);
       let bestGrade = 'Terrible';
       car.bestIn.forEach(primaryType => {
         const gradeOrList = envGrades[primaryType];
@@ -666,7 +672,7 @@
                   const chem = getChemistry(assignedTeam);
                   const score = chem.total;
 
-                  if (viableSlots >= 2 && score > bestScore) {
+                  if (viableSlots === currentTypes.length && score > bestScore) {
                     bestScore = score;
                     bestHand = trio;
                     bestAssignment = assignment;
