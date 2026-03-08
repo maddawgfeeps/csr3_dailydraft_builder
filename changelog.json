@@ -1,8 +1,17 @@
 {
   "entries": [
     {
-      "version": "v0.0.4",
+      "version": "v0.0.5",
       "date": "Current",
+      "changes": [
+        "Added account controls with Create Account, Login, and Logout actions in the app header.",
+        "Introduced IndexedDB-backed user and garage persistence so each account stores its own garage selections.",
+        "Added db/schema.sql documenting users and garages table schema for backend/database setup."
+      ]
+    },
+    {
+      "version": "v0.0.4",
+      "date": "Previous",
       "changes": [
         "Auto-Populated results now clearly show whether they were generated with My Garage or Default Garage.",
         "Switching garage mode while Auto-Populated hands are visible now smoothly re-runs and refreshes those hands.",

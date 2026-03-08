@@ -57,7 +57,21 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.4 © MaddawgFeeps</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.5 © MaddawgFeeps</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 pt-5">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <div class="text-xs uppercase tracking-wider text-zinc-500">Account</div>
+        <div id="account-status" class="text-sm text-zinc-300">Signed in as Guest</div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button id="create-account-btn" onclick="openAuthModal('create')" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Create Account</button>
+        <button id="login-account-btn" onclick="openAuthModal('login')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-sm font-semibold">Login</button>
+        <button id="logout-account-btn" onclick="logoutAccount()" class="hidden px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Logout</button>
       </div>
     </div>
   </div>
@@ -206,6 +220,35 @@
     </div>
   </div>
 
+  <!-- Auth modal -->
+  <div id="auth-modal" class="fixed inset-0 bg-black/70 z-[80] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-md">
+      <div class="flex items-center justify-between mb-4">
+        <h4 id="auth-modal-title" class="text-lg font-semibold">Account Access</h4>
+        <button onclick="closeAuthModal()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <button id="auth-tab-login" onclick="switchAuthTab('login')" class="px-3 py-2 rounded-xl text-sm bg-zinc-800">Login</button>
+        <button id="auth-tab-create" onclick="switchAuthTab('create')" class="px-3 py-2 rounded-xl text-sm bg-zinc-800">Create</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1">Username</label>
+          <input id="auth-username" type="text" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2" autocomplete="username" />
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1">Password</label>
+          <input id="auth-password" type="password" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2" autocomplete="current-password" />
+        </div>
+      </div>
+      <p id="auth-message" class="text-xs text-zinc-400 mt-3 min-h-[16px]"></p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button onclick="closeAuthModal()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Cancel</button>
+        <button id="auth-submit-btn" onclick="submitAuth()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Continue</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ────────────────────────────────────────────────
     // DATA & STATE
@@ -219,6 +262,9 @@
     let currentTypes = [];
     let team = {};
 
+    let db = null;
+    let authMode = 'login';
+    let currentUser = null;
     let isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';
     let userGarageData = JSON.parse(localStorage.getItem('csr3UserGarage')) || {};
 
@@ -296,6 +342,154 @@
       debugAuditLog = [];
       localStorage.removeItem('csr3DebugAuditLog');
       renderDebugLog();
+    }
+
+    function getGarageStorageKey(userId) {
+      return `csr3UserGarage:${userId}`;
+    }
+
+    async function initDatabase() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open('csr3_builder', 1);
+        req.onupgradeneeded = event => {
+          const database = event.target.result;
+          if (!database.objectStoreNames.contains('users')) {
+            const usersStore = database.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+            usersStore.createIndex('username', 'username', { unique: true });
+          }
+          if (!database.objectStoreNames.contains('garages')) {
+            const garageStore = database.createObjectStore('garages', { keyPath: 'id', autoIncrement: true });
+            garageStore.createIndex('userId', 'userId', { unique: true });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error || new Error('Unable to initialize IndexedDB'));
+      });
+    }
+
+    function runTx(storeName, mode, worker) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, mode);
+        const store = tx.objectStore(storeName);
+        const request = worker(store);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error || new Error('Database transaction failed'));
+      });
+    }
+
+    async function createUser(username, password) {
+      const cleanUsername = username.trim();
+      const existing = await runTx('users', 'readonly', store => store.index('username').get(cleanUsername));
+      if (existing) throw new Error('Username is already taken.');
+      const id = await runTx('users', 'readwrite', store => store.add({ username: cleanUsername, password }));
+      const user = { id, username: cleanUsername };
+      localStorage.setItem('csr3CurrentUser', JSON.stringify(user));
+      await runTx('garages', 'readwrite', store => store.put({ userId: id, garageData: {} }));
+      return user;
+    }
+
+    async function loginUser(username, password) {
+      const cleanUsername = username.trim();
+      const user = await runTx('users', 'readonly', store => store.index('username').get(cleanUsername));
+      if (!user || user.password !== password) throw new Error('Invalid username or password.');
+      const safeUser = { id: user.id, username: user.username };
+      localStorage.setItem('csr3CurrentUser', JSON.stringify(safeUser));
+      return safeUser;
+    }
+
+    async function loadGarageForUser(user) {
+      const record = await runTx('garages', 'readonly', store => store.index('userId').get(user.id));
+      userGarageData = record?.garageData || {};
+      isCustomGarage = true;
+      localStorage.setItem(getGarageStorageKey(user.id), JSON.stringify(userGarageData));
+      localStorage.setItem('csr3IsCustomGarage', 'true');
+      localStorage.removeItem('csr3UserGarage');
+    }
+
+    async function saveGarageToDb() {
+      if (!currentUser) return;
+      const payload = { userId: currentUser.id, garageData: userGarageData };
+      const existing = await runTx('garages', 'readonly', store => store.index('userId').get(currentUser.id));
+      if (existing) {
+        payload.id = existing.id;
+      }
+      await runTx('garages', 'readwrite', store => store.put(payload));
+    }
+
+    function updateAccountUi() {
+      const status = document.getElementById('account-status');
+      const createBtn = document.getElementById('create-account-btn');
+      const loginBtn = document.getElementById('login-account-btn');
+      const logoutBtn = document.getElementById('logout-account-btn');
+      if (!status || !createBtn || !loginBtn || !logoutBtn) return;
+      status.textContent = currentUser ? `Signed in as ${currentUser.username}` : 'Signed in as Guest';
+      createBtn.classList.toggle('hidden', !!currentUser);
+      loginBtn.classList.toggle('hidden', !!currentUser);
+      logoutBtn.classList.toggle('hidden', !currentUser);
+    }
+
+    function openAuthModal(mode = 'login') {
+      authMode = mode;
+      document.getElementById('auth-modal').classList.remove('hidden');
+      document.getElementById('auth-modal').classList.add('flex');
+      switchAuthTab(mode);
+      document.getElementById('auth-message').textContent = '';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('auth-modal').classList.remove('flex');
+      document.getElementById('auth-username').value = '';
+      document.getElementById('auth-password').value = '';
+      document.getElementById('auth-message').textContent = '';
+    }
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      const loginTab = document.getElementById('auth-tab-login');
+      const createTab = document.getElementById('auth-tab-create');
+      const title = document.getElementById('auth-modal-title');
+      const submit = document.getElementById('auth-submit-btn');
+      const passwordInput = document.getElementById('auth-password');
+      if (!loginTab || !createTab || !title || !submit || !passwordInput) return;
+
+      loginTab.className = `px-3 py-2 rounded-xl text-sm ${mode === 'login' ? 'bg-emerald-600 font-semibold' : 'bg-zinc-800'}`;
+      createTab.className = `px-3 py-2 rounded-xl text-sm ${mode === 'create' ? 'bg-emerald-600 font-semibold' : 'bg-zinc-800'}`;
+      title.textContent = mode === 'create' ? 'Create Account' : 'Login';
+      submit.textContent = mode === 'create' ? 'Create Account' : 'Login';
+      passwordInput.autocomplete = mode === 'create' ? 'new-password' : 'current-password';
+    }
+
+    async function submitAuth() {
+      const username = document.getElementById('auth-username').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const message = document.getElementById('auth-message');
+      if (!username || !password) {
+        message.textContent = 'Username and password are required.';
+        message.className = 'text-xs text-red-400 mt-3 min-h-[16px]';
+        return;
+      }
+      try {
+        currentUser = authMode === 'create' ? await createUser(username, password) : await loginUser(username, password);
+        await loadGarageForUser(currentUser);
+        updateAccountUi();
+        updateGarageHeaderAndButton();
+        updateAll();
+        closeAuthModal();
+      } catch (err) {
+        message.textContent = err.message || 'Authentication failed.';
+        message.className = 'text-xs text-red-400 mt-3 min-h-[16px]';
+      }
+    }
+
+    function logoutAccount() {
+      currentUser = null;
+      localStorage.removeItem('csr3CurrentUser');
+      userGarageData = JSON.parse(localStorage.getItem('csr3UserGarage')) || {};
+      isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';
+      updateAccountUi();
+      updateGarageHeaderAndButton();
+      updateAll();
     }
 
     function getGradeLabel(type, car) {
@@ -392,7 +586,12 @@
     }
 
     function saveGarageState() {
-      localStorage.setItem('csr3UserGarage', JSON.stringify(userGarageData));
+      if (currentUser) {
+        localStorage.setItem(getGarageStorageKey(currentUser.id), JSON.stringify(userGarageData));
+        saveGarageToDb().catch(err => console.error('Failed saving garage to database', err));
+      } else {
+        localStorage.setItem('csr3UserGarage', JSON.stringify(userGarageData));
+      }
       localStorage.setItem('csr3IsCustomGarage', isCustomGarage);
     }
 
@@ -924,6 +1123,13 @@
     // ────────────────────────────────────────────────
     async function loadData() {
       try {
+        db = await initDatabase();
+        const storedUser = localStorage.getItem('csr3CurrentUser');
+        if (storedUser) {
+          currentUser = JSON.parse(storedUser);
+          await loadGarageForUser(currentUser);
+        }
+
         const t = await fetch('./tracks.json'); tracksData = await t.json();
         const c = await fetch('./cars.json'); const d = await c.json(); allCars = d.cars;
         const diff = await fetch('./difficulty.json'); difficultyData = await diff.json();
@@ -932,6 +1138,7 @@
         changelogEntries = changelogData.entries || [];
         debugAuditLog = JSON.parse(localStorage.getItem('csr3DebugAuditLog') || '[]');
         renderDebugLog();
+        updateAccountUi();
 
         populateSelectors();
         currentTrack = Object.keys(tracksData.tracks)[0];
