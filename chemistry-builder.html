@@ -85,7 +85,16 @@
         <button onclick="openGarageEditor()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
           Manage My Garage
         </button>
+        <button onclick="toggleDebugMode()" id="debug-mode-btn" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium">Debug: Off</button>
       </div>
+    </div>
+
+    <div id="debug-log-panel" class="hidden mb-6 bg-zinc-900 border border-zinc-700 rounded-2xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-300">Debug Audit Log</h3>
+        <button onclick="clearDebugLog()" class="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-lg">Clear</button>
+      </div>
+      <pre id="debug-log-output" class="text-xs text-zinc-400 max-h-44 overflow-y-auto whitespace-pre-wrap"></pre>
     </div>
 
     <div class="grid grid-cols-12 gap-8">
@@ -221,6 +230,8 @@
     const gradeAdjustment = { "Perfect": 0, "Good": 7, "Okay": 4, "Bad": 0, "Terrible": 0 };
 
     let changelogEntries = [];
+    let debugAuditLog = [];
+    let isDebugMode = new URLSearchParams(window.location.search).has('debug') || localStorage.getItem('csr3DebugMode') === 'true';
 
     // ────────────────────────────────────────────────
     // CHEMISTRY (now includes Difficulty)
@@ -241,20 +252,74 @@
     function getSlotGradeMatrix(type) {
       const envCompatibility = tracksData?.slotCompatibility?.[currentEnv]?.[type];
       if (envCompatibility && Object.keys(envCompatibility).length > 0) return envCompatibility;
-      return tracksData?.slotCompatibility?.Dry?.[type] || {};
+
+      const dryCompatibility = tracksData?.slotCompatibility?.Dry?.[type];
+      if (dryCompatibility && Object.keys(dryCompatibility).length > 0) return dryCompatibility;
+
+      const fallbackFromOtherEnv = Object.values(tracksData?.slotCompatibility || {})
+        .map(matrix => matrix?.[type])
+        .find(matrix => matrix && Object.keys(matrix).length > 0);
+      if (fallbackFromOtherEnv) return fallbackFromOtherEnv;
+
+      return {};
+    }
+
+    function auditLog(action, payload = {}) {
+      if (!isDebugMode) return;
+      const timestamp = new Date().toISOString();
+      debugAuditLog.unshift({ timestamp, action, payload });
+      debugAuditLog = debugAuditLog.slice(0, 200);
+      localStorage.setItem('csr3DebugAuditLog', JSON.stringify(debugAuditLog));
+      renderDebugLog();
+      console.debug(`[AUDIT] ${timestamp} ${action}`, payload);
+    }
+
+    function renderDebugLog() {
+      const output = document.getElementById('debug-log-output');
+      const panel = document.getElementById('debug-log-panel');
+      const debugBtn = document.getElementById('debug-mode-btn');
+      if (!output || !panel || !debugBtn) return;
+
+      debugBtn.textContent = `Debug: ${isDebugMode ? 'On' : 'Off'}`;
+      panel.classList.toggle('hidden', !isDebugMode);
+      output.textContent = debugAuditLog.map(entry => `${entry.timestamp} | ${entry.action} | ${JSON.stringify(entry.payload)}`).join('\n');
+    }
+
+    function toggleDebugMode() {
+      isDebugMode = !isDebugMode;
+      localStorage.setItem('csr3DebugMode', String(isDebugMode));
+      if (isDebugMode) auditLog('debug_mode_enabled', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty });
+      renderDebugLog();
+    }
+
+    function clearDebugLog() {
+      debugAuditLog = [];
+      localStorage.removeItem('csr3DebugAuditLog');
+      renderDebugLog();
     }
 
     function getGradeLabel(type, car) {
       if (!car || !Array.isArray(car.bestIn) || !car.bestIn.length) return 'Terrible';
       const envGrades = getSlotGradeMatrix(type);
+      const hasCompatibilityMatrix = Object.keys(envGrades || {}).length > 0;
       let bestGrade = 'Terrible';
+
       car.bestIn.forEach(primaryType => {
-        const gradeOrList = envGrades[primaryType];
-        const gradeList = Array.isArray(gradeOrList) ? gradeOrList : (gradeOrList ? [gradeOrList] : []);
+        let gradeList = [];
+
+        if (hasCompatibilityMatrix) {
+          const gradeOrList = envGrades[primaryType];
+          gradeList = Array.isArray(gradeOrList) ? gradeOrList : (gradeOrList ? [gradeOrList] : []);
+        } else {
+          // Final fallback: if no matrix exists at all, only exact type matches are treated as perfect.
+          gradeList = [primaryType === type ? 'Perfect' : 'Terrible'];
+        }
+
         gradeList.forEach(grade => {
           if ((gradePriority[grade] || 0) > (gradePriority[bestGrade] || 0)) bestGrade = grade;
         });
       });
+
       return bestGrade;
     }
 
@@ -505,9 +570,15 @@
       const name = ev.dataTransfer.getData("carName");
       if (Object.values(team).some(c => c?.name === name)) return;
       team[getSlotKey(slotIndex)] = { name };
+      auditLog('car_assigned', { name, slotIndex });
       updateAll();
     }
-    function resetTeam() { team = {}; setTeamSelectionVisibility(true); updateAll(); }
+    function resetTeam() {
+      team = {};
+      auditLog('team_reset');
+      setTeamSelectionVisibility(true);
+      updateAll();
+    }
 
     // ────────────────────────────────────────────────
     // GARAGE MODE
@@ -517,6 +588,7 @@
       garageList?.classList.add('is-fading');
       await new Promise(resolve => setTimeout(resolve, 220));
       isCustomGarage = !isCustomGarage;
+      auditLog('garage_mode_toggled', { isCustomGarage });
       updateGarageHeaderAndButton();
       saveGarageState();
       updateAll();
@@ -643,6 +715,7 @@
     function autoPopulateHands(options = {}) {
       const { smoothTransition = false } = options;
       const runPopulation = () => {
+        auditLog('auto_populate_start', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty, isCustomGarage });
         autoHands = [];
         let available = sortedCars(allCars).filter(c => {
           const userData = userGarageData[c.name] || {};
@@ -721,6 +794,7 @@
           setTeamSelectionVisibility(true);
           setResetButtonVisibility(true);
         }
+        auditLog('auto_populate_end', { handCount: autoHands.length });
         renderGarage();
       };
 
@@ -840,6 +914,7 @@
     // ────────────────────────────────────────────────
     function changeDifficulty() {
       currentDifficulty = document.getElementById('difficulty-select').value;
+      auditLog('difficulty_changed', { currentDifficulty });
       updateAll();
       if (autoHands.length) refreshAutoHandsForDifficulty();
     }
@@ -855,6 +930,8 @@
         const changelog = await fetch('./changelog.json');
         const changelogData = await changelog.json();
         changelogEntries = changelogData.entries || [];
+        debugAuditLog = JSON.parse(localStorage.getItem('csr3DebugAuditLog') || '[]');
+        renderDebugLog();
 
         populateSelectors();
         currentTrack = Object.keys(tracksData.tracks)[0];
@@ -868,6 +945,7 @@
         populateDifficultyDropdown();
         updateGarageHeaderAndButton();
         loadTrackAndEnv();
+        auditLog('app_loaded', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty, cars: allCars.length });
       } catch(e) { console.error(e); }
     }
 
@@ -903,24 +981,6 @@
       es.onchange = e => { currentEnv = e.target.value; loadTrackAndEnv(); };
     }
 
-    function populateFilters() {
-      const rarities = [...new Set(allCars.map(c => c.rarity))].sort();
-      const starsList = ["1 Star","2 Star","3 Star","4 Star","5 Star"];
-      const countries = [...new Set(allCars.map(c => c.country))].sort();
-      const manufs = [...new Set(allCars.map(c => c.manufacturer))].sort();
-      const bestIns = [...new Set(allCars.flatMap(c => c.bestIn || []))].sort();
-      const addOptions = (id, list) => {
-        const sel = document.getElementById(id);
-        sel.innerHTML = '<option value="All">All</option>';
-        list.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
-      };
-      addOptions('filter-rarity', rarities);
-      addOptions('filter-stars', starsList);
-      addOptions('filter-country', countries);
-      addOptions('filter-manuf', manufs);
-      addOptions('filter-bestin', bestIns);
-    }
-
     function openChangelog() {
       const container = document.getElementById('changelog-list');
       container.innerHTML = changelogEntries.map(entry => `
@@ -946,6 +1006,7 @@
       const types = tracksData.tracks[currentTrack].environments[currentEnv]?.types || [];
       document.getElementById('env-subtitle').textContent = types.join(" • ");
       currentTypes = types;
+      auditLog('track_or_env_changed', { currentTrack, currentEnv, types });
       renderSlotsContainer();
       resetTeam();
       updateAll();
