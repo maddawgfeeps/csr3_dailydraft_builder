@@ -1518,24 +1518,29 @@
     // ────────────────────────────────────────────────
     // DATA LOADING
     // ────────────────────────────────────────────────
+    async function fetchJsonNoCache(path) {
+      const response = await fetch(`${path}?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+      if (!response.ok) throw new Error(`Failed to load ${path}: ${response.status}`);
+      return response.json();
+    }
+
     async function loadData() {
       try {
         db = await initDatabase();
 
-        const t = await fetch('./tracks.json');
-        defaultTracksData = await t.json();
+        defaultTracksData = await fetchJsonNoCache('./tracks.json');
         tracksData = JSON.parse(JSON.stringify(defaultTracksData));
 
-        const c = await fetch('./cars.json');
-        const d = await c.json();
+        const d = await fetchJsonNoCache('./cars.json');
         defaultCarsData = d.cars.map(car => ({ ...car }));
         allCars = defaultCarsData.map(car => ({ ...car }));
 
-        const diff = await fetch('./difficulty.json');
-        difficultyData = await diff.json();
+        difficultyData = await fetchJsonNoCache('./difficulty.json');
 
-        const changelog = await fetch('./changelog.json');
-        const changelogData = await changelog.json();
+        const changelogData = await fetchJsonNoCache('./changelog.json');
         changelogEntries = changelogData.entries || [];
 
         mergedLog = JSON.parse(localStorage.getItem('csr3MergedLog') || '[]');
@@ -1603,8 +1608,16 @@
       es.onchange = e => { currentEnv = e.target.value; loadTrackAndEnv(); };
     }
 
-    function openChangelog() {
+    async function openChangelog() {
       const container = document.getElementById('changelog-list');
+
+      try {
+        const changelogData = await fetchJsonNoCache('./changelog.json');
+        changelogEntries = changelogData.entries || [];
+      } catch (err) {
+        console.error(err);
+      }
+
       container.innerHTML = changelogEntries.map(entry => `
         <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4">
           <div class="text-sm text-yellow-300 font-semibold mb-1">${entry.version}</div>
