@@ -52,26 +52,18 @@
 <body class="min-h-screen pb-12">
   <!-- HEADER -->
   <div class="bg-zinc-900 border-b border-zinc-800">
-    <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-      <div><h1 class="text-6xl font-black tracking-[-4px] text-white">CSR 3</h1></div>
+    <div class="max-w-7xl mx-auto px-6 py-6 flex items-start justify-between gap-6">
+      <div><h1 class="text-6xl font-black tracking-[-4px] text-white">CSR <span class="text-red-500">3</span></h1></div>
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.5 © MaddawgFeeps</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="max-w-7xl mx-auto px-6 pt-5">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <div>
-        <div class="text-xs uppercase tracking-wider text-zinc-500">Account</div>
-        <div id="account-status" class="text-sm text-zinc-300">Signed in as Guest</div>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <button id="create-account-btn" onclick="openAuthModal('create')" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Create Account</button>
-        <button id="login-account-btn" onclick="openAuthModal('login')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-sm font-semibold">Login</button>
-        <button id="logout-account-btn" onclick="logoutAccount()" class="hidden px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Logout</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.6 © MaddawgFeeps</button>
+        <div id="account-status" class="text-xs text-zinc-400 mt-2">Signed in as Guest</div>
+        <div class="flex gap-2 justify-end mt-1">
+          <button id="create-account-btn" onclick="openAuthModal('create')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-medium">Create</button>
+          <button id="login-account-btn" onclick="openAuthModal('login')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-medium">Login</button>
+          <button id="logout-account-btn" onclick="logoutAccount()" class="hidden px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-medium">Logout</button>
+        </div>
       </div>
     </div>
   </div>
@@ -87,25 +79,32 @@
       </div>
     </div>
 
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-6 gap-4">
       <div>
         <h1 id="track-title" class="text-4xl font-bold tracking-tight">Loading...</h1>
         <p id="env-subtitle" class="text-zinc-400">Loading...</p>
       </div>
-      <div class="flex gap-3">
-        <button onclick="toggleGarageMode()" id="garage-mode-btn" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium flex items-center gap-2">
-          <span id="garage-mode-text">Use My Garage</span>
-        </button>
-        <button onclick="openGarageEditor()" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-2xl font-semibold flex items-center gap-2">
-          Manage My Garage
-        </button>
-        <button onclick="toggleDebugMode()" id="debug-mode-btn" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl font-medium">Debug: Off</button>
+      <div class="flex flex-col gap-2 items-end">
+        <div class="flex flex-wrap gap-2 justify-end">
+          <button onclick="toggleGarageMode()" id="garage-mode-btn" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">
+            <span id="garage-mode-text">Use My Garage</span>
+          </button>
+          <button onclick="openGarageEditor()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">
+            Manage My Garage
+          </button>
+          <button onclick="toggleDebugMode()" id="debug-mode-btn" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Debug: Off</button>
+        </div>
+        <div class="flex flex-wrap gap-2 justify-end">
+          <button onclick="openTracksEditor()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Manage Tracks</button>
+          <button onclick="openCarAttributesEditor()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Manage Car Attributes</button>
+          <button onclick="openViableAlternativesEditor()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium">Manage Viable Alts</button>
+        </div>
       </div>
     </div>
 
     <div id="debug-log-panel" class="hidden mb-6 bg-zinc-900 border border-zinc-700 rounded-2xl p-4">
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-300">Debug Audit Log</h3>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-300">Activity + Debug Log</h3>
         <button onclick="clearDebugLog()" class="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-lg">Clear</button>
       </div>
       <pre id="debug-log-output" class="text-xs text-zinc-400 max-h-44 overflow-y-auto whitespace-pre-wrap"></pre>
@@ -208,6 +207,51 @@
     </div>
   </div>
 
+  <!-- Track classes editor modal -->
+  <div id="tracks-modal" class="fixed inset-0 bg-black/70 z-[65] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-5xl max-h-[90vh] overflow-hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-semibold">Manage Tracks</h4>
+        <button onclick="closeTracksEditor()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div id="tracks-editor-list" class="space-y-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+      <div class="mt-5 flex justify-between">
+        <button onclick="restoreDefaultTracks()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Restore Defaults</button>
+        <button onclick="saveTrackClasses()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Track Classes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Viable alternatives editor modal -->
+  <div id="viable-modal" class="fixed inset-0 bg-black/70 z-[66] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-5xl max-h-[90vh] overflow-hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-semibold">Manage Viable Alternatives</h4>
+        <button onclick="closeViableAlternativesEditor()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div id="viable-editor-list" class="space-y-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+      <div class="mt-5 flex justify-between">
+        <button onclick="restoreDefaultViableAlternatives()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Restore Defaults</button>
+        <button onclick="saveViableAlternatives()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Viable Alternatives</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Car attributes editor modal -->
+  <div id="car-attributes-modal" class="fixed inset-0 bg-black/70 z-[67] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-5xl max-h-[90vh] overflow-hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-semibold">Manage Car Attributes</h4>
+        <button onclick="closeCarAttributesEditor()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div id="car-attributes-editor-list" class="space-y-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+      <div class="mt-5 flex justify-between">
+        <button onclick="restoreDefaultCarAttributes()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Restore Defaults</button>
+        <button onclick="saveCarAttributes()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Car Attributes</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Changelog modal -->
   <div id="changelog-modal" class="fixed inset-0 bg-black/70 z-[70] hidden items-center justify-center p-4">
@@ -268,6 +312,16 @@
     let isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';
     let userGarageData = JSON.parse(localStorage.getItem('csr3UserGarage')) || {};
 
+    let defaultTracksData = null;
+    let defaultCarsData = [];
+    let userTrackOverrides = {};
+    let userViableOverrides = {};
+    let userCarAttributeOverrides = {};
+    let trackEditorDraft = {};
+    let viableEditorDraft = {};
+    let carAttributeEditorDraft = {};
+    const gradeOptions = ['Perfect','Good','Okay','Bad','Terrible'];
+
     const slotColors = { "Drag":"#ef4444", "Street":"#3b82f6", "Tour":"#a855f7", "Sport":"#22c55e", "Grip":"#eab308" };
 
     let filters = { rarity: 'All', stars: 'All', country: 'All', manufacturer: 'All', bestIn: 'All' };
@@ -276,7 +330,7 @@
     const gradeAdjustment = { "Perfect": 0, "Good": 7, "Okay": 4, "Bad": 0, "Terrible": 0 };
 
     let changelogEntries = [];
-    let debugAuditLog = [];
+    let mergedLog = JSON.parse(localStorage.getItem('csr3MergedLog') || '[]');
     let isDebugMode = new URLSearchParams(window.location.search).has('debug') || localStorage.getItem('csr3DebugMode') === 'true';
 
     // ────────────────────────────────────────────────
@@ -310,14 +364,24 @@
       return {};
     }
 
+    function addMergedLog(source, action, payload = {}) {
+      const timestamp = new Date().toISOString();
+      mergedLog.unshift({ timestamp, source, action, payload });
+      mergedLog = mergedLog.slice(0, 300);
+      localStorage.setItem('csr3MergedLog', JSON.stringify(mergedLog));
+      renderDebugLog();
+      if (isDebugMode || source === 'activity') {
+        console.debug(`[${source.toUpperCase()}] ${timestamp} ${action}`, payload);
+      }
+    }
+
     function auditLog(action, payload = {}) {
       if (!isDebugMode) return;
-      const timestamp = new Date().toISOString();
-      debugAuditLog.unshift({ timestamp, action, payload });
-      debugAuditLog = debugAuditLog.slice(0, 200);
-      localStorage.setItem('csr3DebugAuditLog', JSON.stringify(debugAuditLog));
-      renderDebugLog();
-      console.debug(`[AUDIT] ${timestamp} ${action}`, payload);
+      addMergedLog('debug', action, payload);
+    }
+
+    function appendActivityLog(action, payload = {}) {
+      addMergedLog('activity', action, payload);
     }
 
     function renderDebugLog() {
@@ -328,20 +392,23 @@
 
       debugBtn.textContent = `Debug: ${isDebugMode ? 'On' : 'Off'}`;
       panel.classList.toggle('hidden', !isDebugMode);
-      output.textContent = debugAuditLog.map(entry => `${entry.timestamp} | ${entry.action} | ${JSON.stringify(entry.payload)}`).join('\n');
+      output.textContent = mergedLog.length
+        ? mergedLog.map(entry => `${entry.timestamp} | ${entry.source} | ${entry.action} | ${JSON.stringify(entry.payload)}`).join('\n')
+        : 'No log entries yet.';
     }
 
     function toggleDebugMode() {
       isDebugMode = !isDebugMode;
       localStorage.setItem('csr3DebugMode', String(isDebugMode));
-      if (isDebugMode) auditLog('debug_mode_enabled', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty });
+      if (isDebugMode) addMergedLog('debug', 'debug_mode_enabled', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty });
       renderDebugLog();
     }
 
     function clearDebugLog() {
-      debugAuditLog = [];
-      localStorage.removeItem('csr3DebugAuditLog');
+      mergedLog = [];
+      localStorage.removeItem('csr3MergedLog');
       renderDebugLog();
+      addMergedLog('activity', 'merged_log_cleared', {});
     }
 
     function getGarageStorageKey(userId) {
@@ -350,7 +417,7 @@
 
     async function initDatabase() {
       return new Promise((resolve, reject) => {
-        const req = indexedDB.open('csr3_builder', 1);
+        const req = indexedDB.open('csr3_builder', 2);
         req.onupgradeneeded = event => {
           const database = event.target.result;
           if (!database.objectStoreNames.contains('users')) {
@@ -360,6 +427,10 @@
           if (!database.objectStoreNames.contains('garages')) {
             const garageStore = database.createObjectStore('garages', { keyPath: 'id', autoIncrement: true });
             garageStore.createIndex('userId', 'userId', { unique: true });
+          }
+          if (!database.objectStoreNames.contains('userProfiles')) {
+            const profileStore = database.createObjectStore('userProfiles', { keyPath: 'id', autoIncrement: true });
+            profileStore.createIndex('userId', 'userId', { unique: true });
           }
         };
         req.onsuccess = () => resolve(req.result);
@@ -385,6 +456,8 @@
       const user = { id, username: cleanUsername };
       localStorage.setItem('csr3CurrentUser', JSON.stringify(user));
       await runTx('garages', 'readwrite', store => store.put({ userId: id, garageData: {} }));
+      await runTx('userProfiles', 'readwrite', store => store.put({ userId: id, profileData: { trackOverrides: {}, viableOverrides: {}, carAttributeOverrides: {} } }));
+      appendActivityLog('account_created', { userId: id, username: cleanUsername });
       return user;
     }
 
@@ -394,6 +467,7 @@
       if (!user || user.password !== password) throw new Error('Invalid username or password.');
       const safeUser = { id: user.id, username: user.username };
       localStorage.setItem('csr3CurrentUser', JSON.stringify(safeUser));
+      appendActivityLog('account_logged_in', { userId: user.id, username: user.username });
       return safeUser;
     }
 
@@ -404,6 +478,7 @@
       localStorage.setItem(getGarageStorageKey(user.id), JSON.stringify(userGarageData));
       localStorage.setItem('csr3IsCustomGarage', 'true');
       localStorage.removeItem('csr3UserGarage');
+      appendActivityLog('garage_loaded_from_db', { userId: user.id, ownedCars: Object.values(userGarageData).filter(c => c?.owned).length });
     }
 
     async function saveGarageToDb() {
@@ -414,6 +489,92 @@
         payload.id = existing.id;
       }
       await runTx('garages', 'readwrite', store => store.put(payload));
+    }
+
+    async function saveUserProfileToDb() {
+      if (!currentUser) return;
+      const payload = {
+        userId: currentUser.id,
+        profileData: {
+          trackOverrides: userTrackOverrides,
+          viableOverrides: userViableOverrides,
+          carAttributeOverrides: userCarAttributeOverrides
+        }
+      };
+      const existing = await runTx('userProfiles', 'readonly', store => store.index('userId').get(currentUser.id));
+      if (existing) payload.id = existing.id;
+      await runTx('userProfiles', 'readwrite', store => store.put(payload));
+      appendActivityLog('user_profile_saved_to_db', {
+        userId: currentUser.id,
+        trackOverrideKeys: Object.keys(userTrackOverrides).length,
+        viableOverrideEnvs: Object.keys(userViableOverrides).length,
+        carOverrideCars: Object.keys(userCarAttributeOverrides).length
+      });
+    }
+
+    async function loadUserProfileForUser(user) {
+      const record = await runTx('userProfiles', 'readonly', store => store.index('userId').get(user.id));
+      userTrackOverrides = record?.profileData?.trackOverrides || {};
+      userViableOverrides = record?.profileData?.viableOverrides || {};
+      userCarAttributeOverrides = record?.profileData?.carAttributeOverrides || {};
+      appendActivityLog('user_profile_loaded_from_db', {
+        userId: user.id,
+        trackOverrideKeys: Object.keys(userTrackOverrides).length,
+        viableOverrideEnvs: Object.keys(userViableOverrides).length,
+        carOverrideCars: Object.keys(userCarAttributeOverrides).length
+      });
+    }
+
+    function getUserStorageKey(suffix) {
+      if (!currentUser) return null;
+      return `csr3${suffix}:${currentUser.id}`;
+    }
+
+    function saveUserProfileToLocal() {
+      if (!currentUser) return;
+      localStorage.setItem(getUserStorageKey('TrackOverrides'), JSON.stringify(userTrackOverrides));
+      localStorage.setItem(getUserStorageKey('ViableOverrides'), JSON.stringify(userViableOverrides));
+      localStorage.setItem(getUserStorageKey('CarAttributeOverrides'), JSON.stringify(userCarAttributeOverrides));
+    }
+
+    function loadUserProfileFromLocal() {
+      if (!currentUser) return;
+      userTrackOverrides = JSON.parse(localStorage.getItem(getUserStorageKey('TrackOverrides')) || '{}');
+      userViableOverrides = JSON.parse(localStorage.getItem(getUserStorageKey('ViableOverrides')) || '{}');
+      userCarAttributeOverrides = JSON.parse(localStorage.getItem(getUserStorageKey('CarAttributeOverrides')) || '{}');
+    }
+
+    function applyTrackOverrides() {
+      if (!defaultTracksData) return;
+      tracksData = JSON.parse(JSON.stringify(defaultTracksData));
+      Object.entries(userTrackOverrides).forEach(([key, types]) => {
+        const [trackName, envName] = key.split('||');
+        if (tracksData.tracks?.[trackName]?.environments?.[envName] && Array.isArray(types) && types.length === 3) {
+          tracksData.tracks[trackName].environments[envName].types = [...types];
+        }
+      });
+      Object.entries(userViableOverrides).forEach(([envName, slotMap]) => {
+        if (!tracksData.slotCompatibility[envName]) tracksData.slotCompatibility[envName] = {};
+        Object.entries(slotMap || {}).forEach(([slotType, classMap]) => {
+          if (!tracksData.slotCompatibility[envName][slotType]) tracksData.slotCompatibility[envName][slotType] = {};
+          Object.entries(classMap || {}).forEach(([sourceClass, grades]) => {
+            tracksData.slotCompatibility[envName][slotType][sourceClass] = Array.isArray(grades) ? [...grades] : [];
+          });
+        });
+      });
+    }
+
+    function applyCarAttributeOverrides() {
+      if (!defaultCarsData?.length) return;
+      allCars = defaultCarsData.map(car => {
+        const override = userCarAttributeOverrides[car.name];
+        if (!override) return { ...car };
+        return {
+          ...car,
+          bestIn: Array.isArray(override.bestIn) ? [...override.bestIn] : [...(car.bestIn || [])],
+          substituteIn: Array.isArray(override.substituteIn) ? [...override.substituteIn] : [...(car.substituteIn || [])]
+        };
+      });
     }
 
     function updateAccountUi() {
@@ -472,6 +633,14 @@
       try {
         currentUser = authMode === 'create' ? await createUser(username, password) : await loginUser(username, password);
         await loadGarageForUser(currentUser);
+        await loadUserProfileForUser(currentUser);
+        saveUserProfileToLocal();
+        applyTrackOverrides();
+        applyCarAttributeOverrides();
+        populateSelectors();
+        populateEnvSelect();
+        populateFilters();
+        loadTrackAndEnv();
         updateAccountUi();
         updateGarageHeaderAndButton();
         updateAll();
@@ -483,13 +652,22 @@
     }
 
     function logoutAccount() {
+      const prevUser = currentUser;
       currentUser = null;
       localStorage.removeItem('csr3CurrentUser');
       userGarageData = JSON.parse(localStorage.getItem('csr3UserGarage')) || {};
+      userTrackOverrides = {};
+      userViableOverrides = {};
+      userCarAttributeOverrides = {};
+      tracksData = JSON.parse(JSON.stringify(defaultTracksData));
+      allCars = defaultCarsData.map(car => ({ ...car }));
       isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';
       updateAccountUi();
       updateGarageHeaderAndButton();
+      populateFilters();
+      loadTrackAndEnv();
       updateAll();
+      appendActivityLog('account_logged_out', { userId: prevUser?.id, username: prevUser?.username });
     }
 
     function getGradeLabel(type, car) {
@@ -588,9 +766,12 @@
     function saveGarageState() {
       if (currentUser) {
         localStorage.setItem(getGarageStorageKey(currentUser.id), JSON.stringify(userGarageData));
-        saveGarageToDb().catch(err => console.error('Failed saving garage to database', err));
+        saveGarageToDb()
+          .then(() => appendActivityLog('garage_saved_to_db', { userId: currentUser.id, ownedCars: Object.values(userGarageData).filter(c => c?.owned).length }))
+          .catch(err => console.error('Failed saving garage to database', err));
       } else {
         localStorage.setItem('csr3UserGarage', JSON.stringify(userGarageData));
+        appendActivityLog('garage_saved_locally', { ownedCars: Object.values(userGarageData).filter(c => c?.owned).length });
       }
       localStorage.setItem('csr3IsCustomGarage', isCustomGarage);
     }
@@ -866,6 +1047,7 @@
       refreshModalList();
       document.getElementById('garage-modal').classList.remove('hidden');
       document.getElementById('garage-modal').classList.add('flex');
+      appendActivityLog('garage_editor_opened', { userId: currentUser?.id || null });
     }
 
     function toggleOwned(name, owned) {
@@ -891,6 +1073,7 @@
       saveGarageState();
       closeGarageEditor();
       updateAll();
+      appendActivityLog('garage_changes_saved', { userId: currentUser?.id || null, ownedCars: Object.values(userGarageData).filter(c => c?.owned).length });
     }
 
     function showClearConfirmation() {
@@ -901,11 +1084,225 @@
       document.getElementById('clear-modal').classList.add('hidden');
       document.getElementById('clear-modal').classList.remove('flex');
     }
+
     function confirmClearGarage() {
       userGarageData = {};
       saveGarageState();
       refreshModalList();
       hideClearConfirmation();
+      appendActivityLog('garage_cleared', { userId: currentUser?.id || null });
+    }
+
+    function openTracksEditor() {
+      trackEditorDraft = JSON.parse(JSON.stringify(userTrackOverrides));
+      renderTracksEditor();
+      document.getElementById('tracks-modal').classList.remove('hidden');
+      document.getElementById('tracks-modal').classList.add('flex');
+      appendActivityLog('tracks_editor_opened', { userId: currentUser?.id || null });
+    }
+
+    function closeTracksEditor() {
+      document.getElementById('tracks-modal').classList.add('hidden');
+      document.getElementById('tracks-modal').classList.remove('flex');
+    }
+
+    function setTrackClassOverride(trackName, envName, slotIndex, value) {
+      const key = `${trackName}||${envName}`;
+      const currentTypes = trackEditorDraft[key] || [...defaultTracksData.tracks[trackName].environments[envName].types];
+      currentTypes[slotIndex] = value;
+      trackEditorDraft[key] = currentTypes;
+    }
+
+    function renderTracksEditor() {
+      const options = ['Drag', 'Street', 'Tour', 'Sport', 'Track'];
+      const container = document.getElementById('tracks-editor-list');
+      container.innerHTML = Object.entries(defaultTracksData.tracks).map(([trackName, trackData]) => `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4">
+          <div class="text-sm font-semibold text-yellow-300 mb-3">${trackName}</div>
+          <div class="space-y-3">
+            ${Object.entries(trackData.environments).map(([envName, envData]) => {
+              const key = `${trackName}||${envName}`;
+              const selected = trackEditorDraft[key] || [...envData.types];
+              return `
+                <div class="bg-zinc-900 rounded-xl p-3">
+                  <div class="text-xs uppercase text-zinc-400 mb-2">${envName}</div>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    ${[0,1,2].map(index => `
+                      <select onchange="setTrackClassOverride('${trackName}', '${envName}', ${index}, this.value)" class="bg-zinc-800 text-white px-3 py-2 rounded-lg border border-zinc-700 text-sm">
+                        ${options.map(type => `<option value="${type}" ${selected[index] === type ? 'selected' : ''}>${type}</option>`).join('')}
+                      </select>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function restoreDefaultTracks() {
+      trackEditorDraft = {};
+      renderTracksEditor();
+      appendActivityLog('tracks_defaults_restored', { userId: currentUser?.id || null });
+    }
+
+    async function saveTrackClasses() {
+      userTrackOverrides = JSON.parse(JSON.stringify(trackEditorDraft));
+      applyTrackOverrides();
+      saveUserProfileToLocal();
+      if (currentUser) await saveUserProfileToDb();
+      document.getElementById('track-select').innerHTML = '';
+      populateSelectors();
+      populateEnvSelect();
+      loadTrackAndEnv();
+      updateAll();
+      closeTracksEditor();
+      appendActivityLog('track_classes_saved', { userId: currentUser?.id || null, overrides: Object.keys(userTrackOverrides).length });
+    }
+
+    function openViableAlternativesEditor() {
+      viableEditorDraft = JSON.parse(JSON.stringify(userViableOverrides));
+      renderViableAlternativesEditor();
+      document.getElementById('viable-modal').classList.remove('hidden');
+      document.getElementById('viable-modal').classList.add('flex');
+      appendActivityLog('viable_editor_opened', { userId: currentUser?.id || null });
+    }
+
+    function closeViableAlternativesEditor() {
+      document.getElementById('viable-modal').classList.add('hidden');
+      document.getElementById('viable-modal').classList.remove('flex');
+    }
+
+    function setViableAlternative(envName, slotType, sourceType, grade, checked) {
+      if (!viableEditorDraft[envName]) viableEditorDraft[envName] = {};
+      if (!viableEditorDraft[envName][slotType]) viableEditorDraft[envName][slotType] = {};
+      const current = viableEditorDraft[envName][slotType][sourceType] || [...(defaultTracksData.slotCompatibility?.[envName]?.[slotType]?.[sourceType] || [])];
+      viableEditorDraft[envName][slotType][sourceType] = checked
+        ? Array.from(new Set([...current, grade]))
+        : current.filter(item => item !== grade);
+    }
+
+    function renderViableAlternativesEditor() {
+      const sourceClasses = ['Drag', 'Street', 'Tour', 'Sport', 'Track'];
+      const container = document.getElementById('viable-editor-list');
+      const envs = Object.keys(defaultTracksData.slotCompatibility || {});
+      container.innerHTML = envs.map(envName => `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4">
+          <div class="text-sm font-semibold text-indigo-300 mb-3">${envName}</div>
+          ${Object.keys(defaultTracksData.slotCompatibility[envName] || {}).map(slotType => `
+            <div class="bg-zinc-900 rounded-xl p-3 mb-3">
+              <div class="text-xs uppercase text-zinc-400 mb-2">${slotType} Slot</div>
+              ${sourceClasses.map(sourceType => {
+                const selected = viableEditorDraft?.[envName]?.[slotType]?.[sourceType] || [...(defaultTracksData.slotCompatibility?.[envName]?.[slotType]?.[sourceType] || [])];
+                return `
+                  <div class="border border-zinc-800 rounded-lg p-2 mb-2">
+                    <div class="text-xs text-zinc-400 mb-1">${sourceType}</div>
+                    <div>
+                      ${gradeOptions.map(grade => `
+                        <label class="inline-flex items-center gap-2 mr-4 mb-2 text-sm text-zinc-300">
+                          <input type="checkbox" ${selected.includes(grade) ? 'checked' : ''} onchange="setViableAlternative('${envName}','${slotType}','${sourceType}','${grade}', this.checked)" class="rounded border-zinc-600 bg-zinc-800">
+                          <span>${grade}</span>
+                        </label>
+                      `).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    function restoreDefaultViableAlternatives() {
+      viableEditorDraft = {};
+      renderViableAlternativesEditor();
+      appendActivityLog('viable_defaults_restored', { userId: currentUser?.id || null });
+    }
+
+    async function saveViableAlternatives() {
+      userViableOverrides = JSON.parse(JSON.stringify(viableEditorDraft));
+      applyTrackOverrides();
+      saveUserProfileToLocal();
+      if (currentUser) await saveUserProfileToDb();
+      loadTrackAndEnv();
+      updateAll();
+      closeViableAlternativesEditor();
+      appendActivityLog('viable_alternatives_saved', { userId: currentUser?.id || null, envs: Object.keys(userViableOverrides).length });
+    }
+
+    function openCarAttributesEditor() {
+      carAttributeEditorDraft = JSON.parse(JSON.stringify(userCarAttributeOverrides));
+      renderCarAttributesEditor();
+      document.getElementById('car-attributes-modal').classList.remove('hidden');
+      document.getElementById('car-attributes-modal').classList.add('flex');
+      appendActivityLog('car_attributes_editor_opened', { userId: currentUser?.id || null });
+    }
+
+    function closeCarAttributesEditor() {
+      document.getElementById('car-attributes-modal').classList.add('hidden');
+      document.getElementById('car-attributes-modal').classList.remove('flex');
+    }
+
+    function setCarAttributeSelection(carName, field, classType, checked) {
+      if (!carAttributeEditorDraft[carName]) carAttributeEditorDraft[carName] = {};
+      const defaultCar = defaultCarsData.find(car => car.name === carName) || {};
+      const current = carAttributeEditorDraft[carName][field] || [...(defaultCar[field] || [])];
+      carAttributeEditorDraft[carName][field] = checked
+        ? Array.from(new Set([...current, classType]))
+        : current.filter(type => type !== classType);
+    }
+
+    function renderCarAttributesEditor() {
+      const classTypes = ['Drag', 'Street', 'Tour', 'Sport', 'Track'];
+      const container = document.getElementById('car-attributes-editor-list');
+      container.innerHTML = sortedCars(defaultCarsData).map(car => {
+        const bestInValues = carAttributeEditorDraft?.[car.name]?.bestIn || [...(car.bestIn || [])];
+        const substituteValues = carAttributeEditorDraft?.[car.name]?.substituteIn || [...(car.substituteIn || [])];
+        return `
+          <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4">
+            <div class="text-sm font-semibold text-purple-300 mb-2">${car.name}</div>
+            <div class="text-xs text-zinc-500 mb-3">${car.rarity} • ${car.country} • ${car.manufacturer}</div>
+            <div class="mb-3">
+              <div class="text-xs uppercase text-zinc-400 mb-2">bestIn</div>
+              ${classTypes.map(type => `
+                <label class="inline-flex items-center gap-2 mr-4 mb-2 text-sm text-zinc-300">
+                  <input type="checkbox" ${bestInValues.includes(type) ? 'checked' : ''} onchange="setCarAttributeSelection('${car.name}','bestIn','${type}', this.checked)" class="rounded border-zinc-600 bg-zinc-800">
+                  <span>${type}</span>
+                </label>
+              `).join('')}
+            </div>
+            <div>
+              <div class="text-xs uppercase text-zinc-400 mb-2">substituteIn</div>
+              ${classTypes.map(type => `
+                <label class="inline-flex items-center gap-2 mr-4 mb-2 text-sm text-zinc-300">
+                  <input type="checkbox" ${substituteValues.includes(type) ? 'checked' : ''} onchange="setCarAttributeSelection('${car.name}','substituteIn','${type}', this.checked)" class="rounded border-zinc-600 bg-zinc-800">
+                  <span>${type}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function restoreDefaultCarAttributes() {
+      carAttributeEditorDraft = {};
+      renderCarAttributesEditor();
+      appendActivityLog('car_attributes_defaults_restored', { userId: currentUser?.id || null });
+    }
+
+    async function saveCarAttributes() {
+      userCarAttributeOverrides = JSON.parse(JSON.stringify(carAttributeEditorDraft));
+      applyCarAttributeOverrides();
+      saveUserProfileToLocal();
+      if (currentUser) await saveUserProfileToDb();
+      populateFilters();
+      loadTrackAndEnv();
+      updateAll();
+      closeCarAttributesEditor();
+      appendActivityLog('car_attributes_saved', { userId: currentUser?.id || null, cars: Object.keys(userCarAttributeOverrides).length });
     }
 
     // ────────────────────────────────────────────────
@@ -1124,22 +1521,38 @@
     async function loadData() {
       try {
         db = await initDatabase();
+
+        const t = await fetch('./tracks.json');
+        defaultTracksData = await t.json();
+        tracksData = JSON.parse(JSON.stringify(defaultTracksData));
+
+        const c = await fetch('./cars.json');
+        const d = await c.json();
+        defaultCarsData = d.cars.map(car => ({ ...car }));
+        allCars = defaultCarsData.map(car => ({ ...car }));
+
+        const diff = await fetch('./difficulty.json');
+        difficultyData = await diff.json();
+
+        const changelog = await fetch('./changelog.json');
+        const changelogData = await changelog.json();
+        changelogEntries = changelogData.entries || [];
+
+        mergedLog = JSON.parse(localStorage.getItem('csr3MergedLog') || '[]');
+        renderDebugLog();
+
         const storedUser = localStorage.getItem('csr3CurrentUser');
         if (storedUser) {
           currentUser = JSON.parse(storedUser);
           await loadGarageForUser(currentUser);
+          await loadUserProfileForUser(currentUser);
+          saveUserProfileToLocal();
         }
 
-        const t = await fetch('./tracks.json'); tracksData = await t.json();
-        const c = await fetch('./cars.json'); const d = await c.json(); allCars = d.cars;
-        const diff = await fetch('./difficulty.json'); difficultyData = await diff.json();
-        const changelog = await fetch('./changelog.json');
-        const changelogData = await changelog.json();
-        changelogEntries = changelogData.entries || [];
-        debugAuditLog = JSON.parse(localStorage.getItem('csr3DebugAuditLog') || '[]');
-        renderDebugLog();
-        updateAccountUi();
+        applyTrackOverrides();
+        applyCarAttributeOverrides();
 
+        updateAccountUi();
         populateSelectors();
         currentTrack = Object.keys(tracksData.tracks)[0];
         currentEnv = Object.keys(tracksData.tracks[currentTrack].environments)[0];
@@ -1152,6 +1565,7 @@
         populateDifficultyDropdown();
         updateGarageHeaderAndButton();
         loadTrackAndEnv();
+        appendActivityLog('app_loaded', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty, cars: allCars.length, user: currentUser?.username || 'guest' });
         auditLog('app_loaded', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty, cars: allCars.length });
       } catch(e) { console.error(e); }
     }
@@ -1170,6 +1584,7 @@
 
     function populateSelectors() {
       const ts = document.getElementById('track-select');
+      ts.innerHTML = '';
       Object.keys(tracksData.tracks).forEach(t => {
         const o = document.createElement('option'); o.value = t; o.textContent = t;
         ts.appendChild(o);

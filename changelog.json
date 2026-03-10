@@ -1,8 +1,20 @@
 {
   "entries": [
     {
-      "version": "v0.0.5",
+      "version": "v0.0.6",
       "date": "Current",
+      "changes": [
+        "Added persistent Data Activity Log events for account creation/login/logout, garage editing/saving, and profile save/load actions.",
+        "Updated header branding so the CSR logo displays a red 3 and bumped the in-app build label to v0.0.6.",
+        "Added Manage Tracks modal with editable per-track class slots, restore defaults, and user-profile-backed Save Track Classes persistence.",
+        "Added Manage Viable Alternatives modal for slotCompatibility editing with grade checkboxes, restore defaults, and user-profile-backed Save Viable Alternatives persistence.",
+        "Added Manage Car Attributes modal for per-car bestIn/substituteIn checkbox editing, restore defaults, and user-profile-backed Save Car Attributes persistence.",
+        "Extended IndexedDB and schema docs with user profile storage for track, viable-alternative, and car-attribute overrides."
+      ]
+    },
+    {
+      "version": "v0.0.5",
+      "date": "Previous",
       "changes": [
         "Added account controls with Create Account, Login, and Logout actions in the app header.",
         "Introduced IndexedDB-backed user and garage persistence so each account stores its own garage selections.",
