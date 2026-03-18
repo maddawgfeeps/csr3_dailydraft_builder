@@ -57,7 +57,7 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.6 © MaddawgFeeps</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.6a © MaddawgFeeps</button>
         <div id="account-status" class="text-xs text-zinc-400 mt-2">Signed in as Guest</div>
         <div class="flex gap-2 justify-end mt-1">
           <button id="create-account-btn" onclick="openAuthModal('create')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-medium">Create</button>
@@ -187,7 +187,16 @@
         </div>
         <button onclick="closeGarageEditor()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
       </div>
-      <div id="modal-garage-list" class="p-6 overflow-y-auto max-h-[65vh]"></div>
+      <div class="px-6 pt-4">
+        <input
+          id="garage-search-input"
+          type="text"
+          placeholder="Search cars, rarity, country, manufacturer, or class..."
+          oninput="handleGarageSearchInput(this.value)"
+          class="w-full bg-zinc-800 text-white px-4 py-2.5 rounded-xl border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/60"
+        >
+      </div>
+      <div id="modal-garage-list" class="p-6 overflow-y-auto max-h-[57vh]"></div>
       <div class="p-6 border-t border-zinc-800 flex justify-between">
         <button onclick="showClearConfirmation()" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium">Clear Garage</button>
         <button onclick="saveUserGarage()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Changes</button>
@@ -244,7 +253,16 @@
         <h4 class="text-lg font-semibold">Manage Car Attributes</h4>
         <button onclick="closeCarAttributesEditor()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
       </div>
-      <div id="car-attributes-editor-list" class="space-y-4 max-h-[65vh] overflow-y-auto pr-2"></div>
+      <div class="mb-4">
+        <input
+          id="car-attributes-search-input"
+          type="text"
+          placeholder="Search cars, rarity, country, manufacturer, or class..."
+          oninput="handleCarAttributesSearchInput(this.value)"
+          class="w-full bg-zinc-800 text-white px-4 py-2.5 rounded-xl border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+        >
+      </div>
+      <div id="car-attributes-editor-list" class="space-y-4 max-h-[56vh] overflow-y-auto pr-2"></div>
       <div class="mt-5 flex justify-between">
         <button onclick="restoreDefaultCarAttributes()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Restore Defaults</button>
         <button onclick="saveCarAttributes()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Car Attributes</button>
@@ -320,6 +338,8 @@
     let trackEditorDraft = {};
     let viableEditorDraft = {};
     let carAttributeEditorDraft = {};
+    let garageEditorSearchQuery = '';
+    let carAttributesSearchQuery = '';
     const gradeOptions = ['Perfect','Good','Okay','Bad','Terrible'];
 
     const slotColors = { "Drag":"#ef4444", "Street":"#3b82f6", "Tour":"#a855f7", "Sport":"#22c55e", "Grip":"#eab308" };
@@ -1015,7 +1035,19 @@
     function refreshModalList() {
       const container = document.getElementById('modal-garage-list');
       container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-      sortedCars(allCars).forEach(car => {
+      const query = garageEditorSearchQuery.toLowerCase();
+      const filteredCars = sortedCars(allCars).filter(car => {
+        if (!query) return true;
+        const searchableText = [
+          car.name,
+          car.rarity,
+          car.country,
+          car.manufacturer,
+          ...(car.bestIn || [])
+        ].join(' ').toLowerCase();
+        return searchableText.includes(query);
+      });
+      filteredCars.forEach(car => {
         const userData = userGarageData[car.name] || { owned: false, stars: "1 Star" };
         const starLevel = parseInt(userData.stars) || 1;
         const bestInText = car.bestIn && car.bestIn.length ? car.bestIn.join(' • ') : '';
@@ -1043,8 +1075,16 @@
       updateGarageCounts();
     }
 
-    function openGarageEditor() {
+    function handleGarageSearchInput(value) {
+      garageEditorSearchQuery = value.trim();
       refreshModalList();
+    }
+
+    function openGarageEditor() {
+      garageEditorSearchQuery = '';
+      refreshModalList();
+      const searchInput = document.getElementById('garage-search-input');
+      if (searchInput) searchInput.value = '';
       document.getElementById('garage-modal').classList.remove('hidden');
       document.getElementById('garage-modal').classList.add('flex');
       appendActivityLog('garage_editor_opened', { userId: currentUser?.id || null });
@@ -1234,7 +1274,10 @@
 
     function openCarAttributesEditor() {
       carAttributeEditorDraft = JSON.parse(JSON.stringify(userCarAttributeOverrides));
+      carAttributesSearchQuery = '';
       renderCarAttributesEditor();
+      const searchInput = document.getElementById('car-attributes-search-input');
+      if (searchInput) searchInput.value = '';
       document.getElementById('car-attributes-modal').classList.remove('hidden');
       document.getElementById('car-attributes-modal').classList.add('flex');
       appendActivityLog('car_attributes_editor_opened', { userId: currentUser?.id || null });
@@ -1257,7 +1300,20 @@
     function renderCarAttributesEditor() {
       const classTypes = ['Drag', 'Street', 'Tour', 'Sport', 'Track'];
       const container = document.getElementById('car-attributes-editor-list');
-      container.innerHTML = sortedCars(defaultCarsData).map(car => {
+      const query = carAttributesSearchQuery.toLowerCase();
+      const filteredCars = sortedCars(defaultCarsData).filter(car => {
+        if (!query) return true;
+        const searchableText = [
+          car.name,
+          car.rarity,
+          car.country,
+          car.manufacturer,
+          ...(car.bestIn || []),
+          ...(car.substituteIn || [])
+        ].join(' ').toLowerCase();
+        return searchableText.includes(query);
+      });
+      container.innerHTML = filteredCars.map(car => {
         const bestInValues = carAttributeEditorDraft?.[car.name]?.bestIn || [...(car.bestIn || [])];
         const substituteValues = carAttributeEditorDraft?.[car.name]?.substituteIn || [...(car.substituteIn || [])];
         return `
@@ -1285,6 +1341,11 @@
           </div>
         `;
       }).join('');
+    }
+
+    function handleCarAttributesSearchInput(value) {
+      carAttributesSearchQuery = value.trim();
+      renderCarAttributesEditor();
     }
 
     function restoreDefaultCarAttributes() {

@@ -1,11 +1,13 @@
 {
   "entries": [
     {
-      "version": "v0.0.6",
+      "version": "v0.0.6a",
       "date": "Current",
       "changes": [
         "Added persistent Data Activity Log events for account creation/login/logout, garage editing/saving, and profile save/load actions.",
-        "Updated header branding so the CSR logo displays a red 3 and bumped the in-app build label to v0.0.6.",
+        "Updated header branding so the CSR logo displays a red 3 and bumped the in-app build label to v0.0.6a.",
+        "Added a realtime search box in Manage My Garage to quickly filter large car lists by name, rarity, country, manufacturer, or class.",
+        "Added a realtime search box in Manage Car Attributes with instant filtering across the same car metadata and class tags.",
         "Added Manage Tracks modal with editable per-track class slots, restore defaults, and user-profile-backed Save Track Classes persistence.",
         "Added Manage Viable Alternatives modal for slotCompatibility editing with grade checkboxes, restore defaults, and user-profile-backed Save Viable Alternatives persistence.",
         "Added Manage Car Attributes modal for per-car bestIn/substituteIn checkbox editing, restore defaults, and user-profile-backed Save Car Attributes persistence.",
