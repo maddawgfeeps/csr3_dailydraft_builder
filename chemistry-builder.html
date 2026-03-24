@@ -205,7 +205,7 @@
   </div>
 
   <!-- Clear garage confirmation -->
-   <div id="clear-modal" class="fixed inset-0 bg-black/70 z-[60] hidden items-center justify-center p-4">␊
+   <div id="clear-modal" class="fixed inset-0 bg-black/70 z-[60] hidden items-center justify-center p-4">
     <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-md">
       <h4 class="text-lg font-semibold mb-2">Clear My Garage?</h4>
       <p class="text-zinc-400 text-sm mb-5">This will remove all ownership/star selections from your custom garage.</p>
@@ -360,10 +360,10 @@
     let currentTypes = [];
     let team = {};
 
-    let db = null;␊
-    let authMode = 'login';␊
-    let currentUser = null;␊
-    let isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';␊
+    let db = null;
+    let authMode = 'login';
+    let currentUser = null;
+    let isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';
     let userGarageData = readJsonFromStorage('csr3UserGarage', {});
     
     let defaultTracksData = null;
@@ -386,7 +386,7 @@
     const gradePriority = { "Terrible": 0, "Bad": 1, "Okay": 2, "Good": 3, "Perfect": 4 };
     const gradeAdjustment = { "Perfect": 0, "Good": 7, "Okay": 4, "Bad": 0, "Terrible": 0 };
 
-    let changelogEntries = [];␊
+    let changelogEntries = [];
     let mergedLog = readJsonFromStorage('csr3MergedLog', []);
     let isDebugMode = new URLSearchParams(window.location.search).has('debug') || localStorage.getItem('csr3DebugMode') === 'true';
 
@@ -594,8 +594,8 @@
       localStorage.setItem(getUserStorageKey('CarAttributeOverrides'), JSON.stringify(userCarAttributeOverrides));
     }
 
-    function loadUserProfileFromLocal() {␊
-      if (!currentUser) return;␊
+    function loadUserProfileFromLocal() {
+      if (!currentUser) return;
       userTrackOverrides = readJsonFromStorage(getUserStorageKey('TrackOverrides'), {});
       userViableOverrides = readJsonFromStorage(getUserStorageKey('ViableOverrides'), {});
       userCarAttributeOverrides = readJsonFromStorage(getUserStorageKey('CarAttributeOverrides'), {});
@@ -711,8 +711,8 @@
 
     function logoutAccount() {
       const prevUser = currentUser;
-      currentUser = null;␊
-      localStorage.removeItem('csr3CurrentUser');␊
+      currentUser = null;
+      localStorage.removeItem('csr3CurrentUser');
       userGarageData = readJsonFromStorage('csr3UserGarage', {});
       userTrackOverrides = {};
       userViableOverrides = {};
