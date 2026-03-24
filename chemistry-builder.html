@@ -57,7 +57,7 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.6a © MaddawgFeeps</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.7 © MaddawgFeeps</button>
         <div id="account-status" class="text-xs text-zinc-400 mt-2">Signed in as Guest</div>
         <div class="flex gap-2 justify-end mt-1">
           <button id="create-account-btn" onclick="openAuthModal('create')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-medium">Create</button>
@@ -910,18 +910,22 @@
         ...Object.values(team).map(c => c?.name).filter(Boolean),
         ...autoHands.flatMap(hand => hand.assignment.map(car => car?.name)).filter(Boolean)
       ]);
-      sortedCars(allCars).forEach(baseCar => {
+
+      const filteredCars = sortedCars(allCars).filter(baseCar => {
         const userData = userGarageData[baseCar.name] || {};
         const isOwned = isCustomGarage ? (userData.owned === true) : true;
-        if (!isOwned || used.has(baseCar.name)) return;
+        if (!isOwned || used.has(baseCar.name)) return false;
         const effective = getEffectiveCar(baseCar.name);
-        if (filters.rarity !== 'All' && effective.rarity !== filters.rarity) return;
-        if (filters.stars !== 'All' && effective.stars !== filters.stars) return;
-        if (filters.country !== 'All' && effective.country !== filters.country) return;
-        if (filters.manufacturer !== 'All' && effective.manufacturer !== filters.manufacturer) return;
-        if (filters.bestIn !== 'All' && (!effective.bestIn || !effective.bestIn.includes(filters.bestIn))) return;
-        container.appendChild(createCarCard(baseCar.name));
+        if (filters.rarity !== 'All' && effective.rarity !== filters.rarity) return false;
+        if (filters.stars !== 'All' && effective.stars !== filters.stars) return false;
+        if (filters.country !== 'All' && effective.country !== filters.country) return false;
+        if (filters.manufacturer !== 'All' && effective.manufacturer !== filters.manufacturer) return false;
+        if (filters.bestIn !== 'All' && (!effective.bestIn || !effective.bestIn.includes(filters.bestIn))) return false;
+        return true;
       });
+
+      const orderedCars = getRecommendedGarageCars(filteredCars);
+      orderedCars.forEach(car => container.appendChild(createCarCard(car.name)));
     }
 
     function formatScore(value) {
@@ -942,6 +946,78 @@
 
     function getAssignedCarCount() {
       return Object.values(team).filter(car => car?.name).length;
+    }
+
+    function getTeamPerformanceScore(teamDraft) {
+      const slotOutcomes = currentTypes.map((type, idx) => {
+        const carName = teamDraft[getSlotKey(idx)]?.name;
+        const car = carName ? getEffectiveCar(carName) : null;
+        return getSlotOutcome(type, car);
+      });
+      const chemistry = getChemistry(teamDraft);
+      return {
+        viableSlots: slotOutcomes.filter(outcome => outcome.isViable).length,
+        wins: slotOutcomes.filter(outcome => outcome.isWin).length,
+        chemistry: chemistry.total,
+        maxChemistry: chemistry.maxTotal
+      };
+    }
+
+    function compareTeamPerformance(a, b) {
+      if ((b?.viableSlots || 0) !== (a?.viableSlots || 0)) return (b?.viableSlots || 0) - (a?.viableSlots || 0);
+      if ((b?.wins || 0) !== (a?.wins || 0)) return (b?.wins || 0) - (a?.wins || 0);
+      if ((b?.chemistry || 0) !== (a?.chemistry || 0)) return (b?.chemistry || 0) - (a?.chemistry || 0);
+      return (b?.maxChemistry || 0) - (a?.maxChemistry || 0);
+    }
+
+    function getRecommendedGarageCars(cars) {
+      const assignedCount = getAssignedCarCount();
+      if (assignedCount === 0 || assignedCount >= currentTypes.length) return cars;
+
+      const openIndexes = currentTypes
+        .map((_, idx) => team[getSlotKey(idx)]?.name ? -1 : idx)
+        .filter(idx => idx !== -1);
+
+      if (!openIndexes.length) return cars;
+
+      const usedNames = new Set(Object.values(team).map(c => c?.name).filter(Boolean));
+
+      return cars
+        .map((car, originalIndex) => {
+          let bestScore = null;
+
+          openIndexes.forEach(slotIdx => {
+            const teamWithCandidate = { ...team, [getSlotKey(slotIdx)]: { name: car.name } };
+            const remainingSlots = openIndexes.filter(idx => idx !== slotIdx);
+
+            if (!remainingSlots.length) {
+              const score = getTeamPerformanceScore(teamWithCandidate);
+              if (!bestScore || compareTeamPerformance(score, bestScore) < 0) bestScore = score;
+              return;
+            }
+
+            const remainingCars = cars.filter(other => other.name !== car.name && !usedNames.has(other.name));
+            if (!remainingCars.length) {
+              const score = getTeamPerformanceScore(teamWithCandidate);
+              if (!bestScore || compareTeamPerformance(score, bestScore) < 0) bestScore = score;
+              return;
+            }
+
+            remainingCars.forEach(other => {
+              const candidateTeam = { ...teamWithCandidate, [getSlotKey(remainingSlots[0])]: { name: other.name } };
+              const score = getTeamPerformanceScore(candidateTeam);
+              if (!bestScore || compareTeamPerformance(score, bestScore) < 0) bestScore = score;
+            });
+          });
+
+          return { car, originalIndex, bestScore };
+        })
+        .sort((a, b) => {
+          const performanceCmp = compareTeamPerformance(a.bestScore, b.bestScore);
+          if (performanceCmp !== 0) return performanceCmp;
+          return a.originalIndex - b.originalIndex;
+        })
+        .map(entry => entry.car);
     }
 
     function updateAll() {
@@ -973,6 +1049,7 @@
       auditLog('car_assigned', { name, slotIndex });
       updateAll();
     }
+
     function resetTeam() {
       team = {};
       auditLog('team_reset');
@@ -1371,9 +1448,31 @@
     // ───────────────────────────────────────────────
     function autoPopulateHands(options = {}) {
       const { smoothTransition = false } = options;
+
+      const buildHandFromAssignment = (assignment) => {
+        const assignedTeam = assignment.reduce((acc, car, idx) => {
+          if (car?.name) acc[getSlotKey(idx)] = { name: car.name };
+          return acc;
+        }, {});
+        const assignedChemistry = getChemistry(assignedTeam);
+        const slotOutcomes = currentTypes.map((type, idx) => getSlotOutcome(type, assignment[idx]));
+        return {
+          cars: assignment.filter(Boolean),
+          assignment,
+          wins: slotOutcomes.filter(outcome => outcome.isWin).length,
+          viableSlots: slotOutcomes.filter(outcome => outcome.isViable).length,
+          chemistry: assignedChemistry.total,
+          minChemistry: assignedChemistry.minTotal,
+          maxChemistry: assignedChemistry.maxTotal,
+          breakdown: assignedChemistry.breakdown,
+          difficultyLines: assignedChemistry.difficultyLines
+        };
+      };
+
       const runPopulation = () => {
         auditLog('auto_populate_start', { track: currentTrack, env: currentEnv, difficulty: currentDifficulty, isCustomGarage });
         autoHands = [];
+
         let available = sortedCars(allCars).filter(c => {
           const userData = userGarageData[c.name] || {};
           return isCustomGarage ? userData.owned : true;
@@ -1388,13 +1487,11 @@
             for (let j = i + 1; j < available.length - 1; j++) {
               for (let k = j + 1; k < available.length; k++) {
                 const trio = [available[i], available[j], available[k]];
-
                 const perms = [[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
                 for (let perm of perms) {
                   const assignment = perm.map(idx => trio[idx]);
                   const slotOutcomes = currentTypes.map((type, slotIdx) => getSlotOutcome(type, assignment[slotIdx]));
                   const viableSlots = slotOutcomes.filter(outcome => outcome.isViable).length;
-
                   const assignedTeam = assignment.reduce((acc, car, idx) => {
                     acc[getSlotKey(idx)] = { name: car.name };
                     return acc;
@@ -1414,25 +1511,9 @@
 
           if (bestScore < 0) break;
 
-          const assignedTeam = bestAssignment.reduce((acc, car, idx) => {
-            acc[getSlotKey(idx)] = { name: car.name };
-            return acc;
-          }, {});
-
-          const assignedChemistry = getChemistry(assignedTeam);
-          const slotOutcomes = currentTypes.map((type, idx) => getSlotOutcome(type, bestAssignment[idx]));
-
-          autoHands.push({
-            cars: bestHand,
-            assignment: bestAssignment,
-            wins: slotOutcomes.filter(outcome => outcome.isWin).length,
-            viableSlots: slotOutcomes.filter(outcome => outcome.isViable).length,
-            chemistry: assignedChemistry.total,
-            minChemistry: assignedChemistry.minTotal,
-            maxChemistry: assignedChemistry.maxTotal,
-            breakdown: assignedChemistry.breakdown,
-            difficultyLines: assignedChemistry.difficultyLines
-          });
+          const hand = buildHandFromAssignment(bestAssignment);
+          hand.cars = bestHand;
+          autoHands.push(hand);
 
           const usedNames = new Set(bestHand.map(c => c.name));
           available = available.filter(c => !usedNames.has(c.name));
@@ -1442,6 +1523,9 @@
 
         renderAutoHands();
         const section = document.getElementById('auto-hands-section');
+        const title = document.getElementById('auto-hands-title');
+        title.textContent = `Auto-Populated Winning Hands (${isCustomGarage ? 'My Garage' : 'Default Garage'})`;
+
         if (autoHands.length > 0) {
           section.classList.remove('hidden');
           setTeamSelectionVisibility(false);
@@ -1573,7 +1657,9 @@
       currentDifficulty = document.getElementById('difficulty-select').value;
       auditLog('difficulty_changed', { currentDifficulty });
       updateAll();
-      if (autoHands.length) refreshAutoHandsForDifficulty();
+      if (autoHands.length) {
+        refreshAutoHandsForDifficulty();
+      }
     }
 
     // ────────────────────────────────────────────────
