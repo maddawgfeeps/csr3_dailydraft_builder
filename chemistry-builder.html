@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<div id="garage-sync-modal" class="fixed inset-0 bg-black/70 z-[61] hidden items-center justify-center p-4"><!DOCTYPE html>
 <html lang="en" class="bg-zinc-950 text-white">
 <head>
   <meta charset="UTF-8">
@@ -331,6 +331,23 @@
   </div>
 
   <script>
+    function safeJsonParse(rawValue, fallback, storageKey = null) {
+      if (typeof rawValue !== 'string') return fallback;
+      const trimmed = rawValue.trim();
+      if (!trimmed) return fallback;
+      try {
+        return JSON.parse(trimmed);
+      } catch (err) {
+        console.warn('Invalid JSON encountered while parsing persisted app data.', { storageKey, rawValue, err });
+        if (storageKey) localStorage.removeItem(storageKey);
+        return fallback;
+      }
+    }
+
+    function readJsonFromStorage(storageKey, fallback) {
+      return safeJsonParse(localStorage.getItem(storageKey), fallback, storageKey);
+    }
+
     // ────────────────────────────────────────────────
     // DATA & STATE
     // ────────────────────────────────────────────────
@@ -343,12 +360,12 @@
     let currentTypes = [];
     let team = {};
 
-    let db = null;
-    let authMode = 'login';
-    let currentUser = null;
-    let isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';
-    let userGarageData = JSON.parse(localStorage.getItem('csr3UserGarage')) || {};
-
+    let db = null;␊
+    let authMode = 'login';␊
+    let currentUser = null;␊
+    let isCustomGarage = localStorage.getItem('csr3IsCustomGarage') === 'true';␊
+    let userGarageData = readJsonFromStorage('csr3UserGarage', {});
+    
     let defaultTracksData = null;
     let defaultCarsData = [];
     let userTrackOverrides = {};
@@ -369,8 +386,8 @@
     const gradePriority = { "Terrible": 0, "Bad": 1, "Okay": 2, "Good": 3, "Perfect": 4 };
     const gradeAdjustment = { "Perfect": 0, "Good": 7, "Okay": 4, "Bad": 0, "Terrible": 0 };
 
-    let changelogEntries = [];
-    let mergedLog = JSON.parse(localStorage.getItem('csr3MergedLog') || '[]');
+    let changelogEntries = [];␊
+    let mergedLog = readJsonFromStorage('csr3MergedLog', []);
     let isDebugMode = new URLSearchParams(window.location.search).has('debug') || localStorage.getItem('csr3DebugMode') === 'true';
 
     // ────────────────────────────────────────────────
@@ -577,11 +594,11 @@
       localStorage.setItem(getUserStorageKey('CarAttributeOverrides'), JSON.stringify(userCarAttributeOverrides));
     }
 
-    function loadUserProfileFromLocal() {
-      if (!currentUser) return;
-      userTrackOverrides = JSON.parse(localStorage.getItem(getUserStorageKey('TrackOverrides')) || '{}');
-      userViableOverrides = JSON.parse(localStorage.getItem(getUserStorageKey('ViableOverrides')) || '{}');
-      userCarAttributeOverrides = JSON.parse(localStorage.getItem(getUserStorageKey('CarAttributeOverrides')) || '{}');
+    function loadUserProfileFromLocal() {␊
+      if (!currentUser) return;␊
+      userTrackOverrides = readJsonFromStorage(getUserStorageKey('TrackOverrides'), {});
+      userViableOverrides = readJsonFromStorage(getUserStorageKey('ViableOverrides'), {});
+      userCarAttributeOverrides = readJsonFromStorage(getUserStorageKey('CarAttributeOverrides'), {});
     }
 
     function applyTrackOverrides() {
@@ -694,9 +711,9 @@
 
     function logoutAccount() {
       const prevUser = currentUser;
-      currentUser = null;
-      localStorage.removeItem('csr3CurrentUser');
-      userGarageData = JSON.parse(localStorage.getItem('csr3UserGarage')) || {};
+      currentUser = null;␊
+      localStorage.removeItem('csr3CurrentUser');␊
+      userGarageData = readJsonFromStorage('csr3UserGarage', {});
       userTrackOverrides = {};
       userViableOverrides = {};
       userCarAttributeOverrides = {};
@@ -1852,12 +1869,15 @@
         const changelogData = await fetchJsonNoCache('./changelog.json');
         changelogEntries = changelogData.entries || [];
 
-        mergedLog = JSON.parse(localStorage.getItem('csr3MergedLog') || '[]');
+        mergedLog = readJsonFromStorage('csr3MergedLog', []);
         renderDebugLog();
 
         const storedUser = localStorage.getItem('csr3CurrentUser');
         if (storedUser) {
-          currentUser = JSON.parse(storedUser);
+          currentUser = safeJsonParse(storedUser, null, 'csr3CurrentUser');
+        }
+
+        if (currentUser) {
           await loadGarageForUser(currentUser);
           await loadUserProfileForUser(currentUser);
           saveUserProfileToLocal();
