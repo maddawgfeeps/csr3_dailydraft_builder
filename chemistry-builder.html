@@ -57,7 +57,7 @@
       <div class="text-right">
         <div class="text-4xl font-bold tracking-tighter bg-gradient-to-r from-white to-yellow-300 bg-clip-text text-transparent">DAILY DRAFT</div>
         <div class="text-2xl font-medium text-zinc-400 -mt-1">TEAM BUILDER</div>
-        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.7 © MaddawgFeeps</button>
+        <button onclick="openChangelog()" class="text-[10px] leading-tight font-medium text-zinc-400 hover:text-zinc-200 transition -mt-0.5">Build v0.0.8 © MaddawgFeeps</button>
         <div id="account-status" class="text-xs text-zinc-400 mt-2">Signed in as Guest</div>
         <div class="flex gap-2 justify-end mt-1">
           <button id="create-account-btn" onclick="openAuthModal('create')" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-medium">Create</button>
@@ -205,13 +205,32 @@
   </div>
 
   <!-- Clear garage confirmation -->
-  <div id="clear-modal" class="fixed inset-0 bg-black/70 z-[60] hidden items-center justify-center p-4">
+   <div id="clear-modal" class="fixed inset-0 bg-black/70 z-[60] hidden items-center justify-center p-4">␊
     <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-md">
       <h4 class="text-lg font-semibold mb-2">Clear My Garage?</h4>
       <p class="text-zinc-400 text-sm mb-5">This will remove all ownership/star selections from your custom garage.</p>
       <div class="flex justify-end gap-3">
         <button onclick="hideClearConfirmation()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Cancel</button>
         <button onclick="confirmClearGarage()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl font-medium">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Garage sync (cars.json mismatch) modal -->
+  <div id="garage-sync-modal" class="fixed inset-0 bg-black/70 z-[61] hidden items-center justify-center p-4">
+    <div class="bg-zinc-900 rounded-3xl border border-zinc-700 p-6 w-full max-w-3xl max-h-[85vh] overflow-hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-semibold">Garage Sync Needed</h4>
+        <button onclick="cancelGarageSyncCleanup()" class="text-zinc-400 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <p class="text-sm text-zinc-300 mb-1">
+        We found cars in your profile that no longer exist in <span class="font-semibold text-yellow-300">cars.json</span>.
+      </p>
+      <p class="text-xs text-zinc-500 mb-4">Review the list below. Save to remove these missing entries from your garage, or cancel to keep your current profile for now.</p>
+      <div id="garage-sync-list" class="space-y-3 max-h-[52vh] overflow-y-auto pr-2"></div>
+      <div class="mt-5 flex justify-end gap-3">
+        <button onclick="cancelGarageSyncCleanup()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl">Cancel</button>
+        <button onclick="saveGarageSyncCleanup()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold">Save Updated Garage</button>
       </div>
     </div>
   </div>
@@ -340,6 +359,7 @@
     let carAttributeEditorDraft = {};
     let garageEditorSearchQuery = '';
     let carAttributesSearchQuery = '';
+    let garageSyncDraft = null;
     const gradeOptions = ['Perfect','Good','Okay','Bad','Terrible'];
 
     const slotColors = { "Drag":"#ef4444", "Street":"#3b82f6", "Tour":"#a855f7", "Sport":"#22c55e", "Grip":"#eab308" };
@@ -657,6 +677,7 @@
         saveUserProfileToLocal();
         applyTrackOverrides();
         applyCarAttributeOverrides();
+        runGarageSyncCheck();
         populateSelectors();
         populateEnvSelect();
         populateFilters();
@@ -777,6 +798,147 @@
 
     function sortedCars(carsArray) {
       return carsArray.slice().sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function normalizeCarName(name) {
+      return String(name || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
+    function levenshteinDistance(a, b) {
+      const rows = a.length + 1;
+      const cols = b.length + 1;
+      const matrix = Array.from({ length: rows }, (_, row) => {
+        const out = new Array(cols).fill(0);
+        out[0] = row;
+        return out;
+      });
+      for (let col = 0; col < cols; col++) matrix[0][col] = col;
+      for (let row = 1; row < rows; row++) {
+        for (let col = 1; col < cols; col++) {
+          const cost = a[row - 1] === b[col - 1] ? 0 : 1;
+          matrix[row][col] = Math.min(
+            matrix[row - 1][col] + 1,
+            matrix[row][col - 1] + 1,
+            matrix[row - 1][col - 1] + cost
+          );
+        }
+      }
+      return matrix[rows - 1][cols - 1];
+    }
+
+    function getReplacementSuggestions(missingName, limit = 3) {
+      const source = normalizeCarName(missingName);
+      if (!source) return [];
+      const sourceTokens = new Set(source.split(' ').filter(Boolean));
+      const scored = allCars.map(car => {
+        const target = normalizeCarName(car.name);
+        if (!target) return { name: car.name, score: 0 };
+        const targetTokens = new Set(target.split(' ').filter(Boolean));
+        const union = new Set([...sourceTokens, ...targetTokens]).size || 1;
+        const intersection = [...sourceTokens].filter(token => targetTokens.has(token)).length;
+        const jaccard = intersection / union;
+        const distance = levenshteinDistance(source, target);
+        const levenshteinScore = 1 - (distance / Math.max(source.length, target.length, 1));
+        const prefixScore = target.startsWith(source) || source.startsWith(target) ? 0.1 : 0;
+        const score = (jaccard * 0.5) + (levenshteinScore * 0.4) + prefixScore;
+        return { name: car.name, score };
+      });
+      return scored
+        .filter(item => item.score >= 0.35)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(item => item.name);
+    }
+
+    function buildGarageSyncDraft() {
+      const validCarNames = new Set(allCars.map(car => car.name));
+      const missingCars = Object.entries(userGarageData)
+        .filter(([carName, data]) => !validCarNames.has(carName) && data?.owned)
+        .map(([carName, data]) => ({
+          missingName: carName,
+          stars: data?.stars || '1 Star',
+          suggestions: getReplacementSuggestions(carName)
+        }));
+      if (!missingCars.length) return null;
+      const cleanedGarageData = JSON.parse(JSON.stringify(userGarageData || {}));
+      missingCars.forEach(({ missingName }) => { delete cleanedGarageData[missingName]; });
+      return {
+        missingCars,
+        originalGarageData: JSON.parse(JSON.stringify(userGarageData || {})),
+        cleanedGarageData
+      };
+    }
+
+    function renderGarageSyncList() {
+      const list = document.getElementById('garage-sync-list');
+      if (!list) return;
+      if (!garageSyncDraft?.missingCars?.length) {
+        list.innerHTML = '<div class="text-sm text-zinc-400">No missing cars found.</div>';
+        return;
+      }
+      list.innerHTML = garageSyncDraft.missingCars.map(item => `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4">
+          <div class="text-sm font-semibold text-red-300">${item.missingName}</div>
+          <div class="text-xs text-zinc-500 mt-1">Saved stars: ${item.stars}</div>
+          <div class="text-xs text-zinc-400 mt-2">Possible replacement${item.suggestions.length === 1 ? '' : 's'}:</div>
+          <div class="text-sm text-emerald-300 mt-1">${item.suggestions.length ? item.suggestions.join(' • ') : 'No close fuzzy match found'}</div>
+        </div>
+      `).join('');
+    }
+
+    function openGarageSyncModal() {
+      renderGarageSyncList();
+      const modal = document.getElementById('garage-sync-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeGarageSyncModal() {
+      const modal = document.getElementById('garage-sync-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function runGarageSyncCheck() {
+      if (!isCustomGarage || !allCars.length) return;
+      const draft = buildGarageSyncDraft();
+      if (!draft) return;
+      garageSyncDraft = draft;
+      userGarageData = JSON.parse(JSON.stringify(draft.cleanedGarageData));
+      updateAll();
+      openGarageSyncModal();
+      appendActivityLog('garage_sync_detected_missing_cars', {
+        userId: currentUser?.id || null,
+        missingCars: draft.missingCars.map(item => item.missingName)
+      });
+    }
+
+    function saveGarageSyncCleanup() {
+      if (!garageSyncDraft) return;
+      saveGarageState();
+      appendActivityLog('garage_sync_cleanup_saved', {
+        userId: currentUser?.id || null,
+        removedCars: garageSyncDraft.missingCars.map(item => item.missingName)
+      });
+      garageSyncDraft = null;
+      closeGarageSyncModal();
+      updateAll();
+    }
+
+    function cancelGarageSyncCleanup() {
+      if (garageSyncDraft?.originalGarageData) {
+        userGarageData = JSON.parse(JSON.stringify(garageSyncDraft.originalGarageData));
+        appendActivityLog('garage_sync_cleanup_cancelled', {
+          userId: currentUser?.id || null,
+          restoredCars: garageSyncDraft.missingCars.map(item => item.missingName)
+        });
+      }
+      garageSyncDraft = null;
+      closeGarageSyncModal();
+      updateAll();
     }
 
     function getSlotKey(index) {
@@ -1703,6 +1865,7 @@
 
         applyTrackOverrides();
         applyCarAttributeOverrides();
+        runGarageSyncCheck();
 
         updateAccountUi();
         populateSelectors();

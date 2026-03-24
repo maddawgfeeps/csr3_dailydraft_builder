@@ -1,8 +1,16 @@
-{
   "entries": [
     {
-      "version": "v0.0.7",
+      "version": "v0.0.8",
       "date": "Current",
+      "changes": [
+        "Added startup garage sync validation that detects owned cars saved in user profiles which no longer exist in cars.json.",
+        "Added a new Garage Sync popup that lists missing cars and suggests fuzzy-match replacements based on similar names.",
+        "Added Save Updated Garage and Cancel actions so players can either persist cleanup changes or keep their existing profile for now."
+      ]
+    },
+    {
+      "version": "v0.0.7",
+      "date": "Previous",
       "changes": [
         "When you manually drop a car into a slot, the remaining Garage list now re-orders in real time to surface stronger win + chemistry options for the open slots.",
         "Manual team editing now stays fully manual: this flow no longer triggers Auto Populate hands while you are hand-building a lineup."
